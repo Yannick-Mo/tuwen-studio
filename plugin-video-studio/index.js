@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 
@@ -15,6 +16,32 @@ function resolveEngine(config) {
     DEFAULT_ENGINE,
   ].filter(Boolean);
   return candidates[0];
+}
+
+// 「这个 spec 的分镜表给人看过没有」的记账本。
+// 存在的意义：把「先出分镜表再花钱」从一句话变成一条走不通的路。
+const seenFile = (engineDir) => path.join(engineDir, '.cache', 'storyboard-seen.json');
+
+async function readSeen(engineDir) {
+  try { return JSON.parse(await fs.readFile(seenFile(engineDir), 'utf8')); } catch { return {}; }
+}
+
+async function markSeen(engineDir, fingerprint, info) {
+  const seen = await readSeen(engineDir);
+  seen[fingerprint] = { at: new Date().toISOString(), ...info };
+  // 只留最近 100 条：这是个缓存，不是档案
+  const trimmed = Object.fromEntries(
+    Object.entries(seen).sort((a, b) => String(a[1].at).localeCompare(String(b[1].at))).slice(-100),
+  );
+  await fs.mkdir(path.dirname(seenFile(engineDir)), { recursive: true });
+  await fs.writeFile(seenFile(engineDir), JSON.stringify(trimmed, null, 2), 'utf8');
+}
+
+/** 按「项目 id + spec 文件字节」算指纹：spec 改一个字就算另一个分镜，得重新给人看 */
+async function specFingerprint(specPath, id) {
+  const buf = await fs.readFile(specPath).catch(() => null);
+  if (!buf) return null;
+  return createHash('sha1').update(id).update('\0').update(buf).digest('hex').slice(0, 16);
 }
 
 /**
@@ -88,6 +115,7 @@ export function apply(ctx, config = {}) {
       '把一份「剧本描述」渲染成图文视频（mp4）：自动生成画面、合成配音、按真实语音时长排时间轴、逐帧渲染、混音、质检。',
       '不确定参数怎么填，先调 video_studio_guide 拿完整手册（选型、分镜写法、交付检查、常见坑）。',
       '重要：第一次调用不要传 confirmed，只会返回分镜表（每镜景别/台词/实测时长/图片张数），一分钱不花。分镜表里的时长是真跑了一遍配音量出来的，不是估的。把分镜表给人看过、改完 spec 之后，再带 confirmed: true 调用一次才真正出图。',
+      '这条不是靠自觉：引擎会记住「这个 spec 的分镜表给没给人看过」。没看过就传 confirmed 也只会再返回一次分镜表，不会出图也不会花钱；spec 改一个字就算另一个分镜，得重新给人看。',
       '画面优先走火山方舟 Seedream（.env 里的 ARK_API_KEY）；配额用尽或没配置时自动降级成本地占位图，结果里的 images.mode 会写明是 ark 还是 mock。',
       '一条 30 秒视频大约 1~2 分钟（含出图）；调用前先把旁白写成短句（每句 8~20 字、对应一个镜头），场景数量 = 镜头数量。',
       'spec.scenes[] 每个元素：narration（必填，该镜旁白）、motif（画面母题，见下）、motion（运镜）、texts（画面上叠加的文字）、transitionOut（转场）。',
@@ -192,12 +220,15 @@ export function apply(ctx, config = {}) {
         type: 'text',
         text: value.planned
           ? [
+            value.gate === 'not-seen'
+              ? '⚠ 这个 spec 的分镜表还没有给人看过，所以这次没有出图，一分钱没花。把下面这张表给你的人看，改完再带 confirmed: true 调用。'
+              : null,
             `分镜表（还没花钱）：${value.storyboard?.scenes?.length || 0} 镜，约 ${value.storyboard?.totals?.estimatedSeconds || '?'}s，需出图 ${value.storyboard?.totals?.images || '?'} 张。`,
             ...(value.storyboard?.scenes || []).map((s) => `${s.index}. ${s.id} ${s.seconds}s ${s.shot}${s.cast?.length ? ` 👤${s.cast.join('+')}` : ''}\n   ${s.narration}`),
             ...(value.storyboard?.warnings || []).map((w) => `! ${w}`),
             ...(value.storyboard?.problems || []).map((p) => `✗ ${p}`),
             value.storyboard?.ok ? '确认后带 confirmed: true 再调用才会真正出图。' : '先修掉上面的问题再确认。',
-          ].join('\n')
+          ].filter((x) => x !== null).join('\n')
           : value.ok
             ? [
               `成片：${value.out}`,
@@ -241,15 +272,23 @@ export function apply(ctx, config = {}) {
         if (!ok) return { ok: false, error: `没有 spec：传 spec，或先把 spec.json 放到 ${specPath}` };
       }
 
-      // 第一道闸门：没确认就只出分镜表，一分钱不花
-      if (!args.confirmed) {
+      // 闸门：没确认、或者这个 spec 的分镜表还没给人看过，都只出分镜表。
+      // 第二条是关键——不然「先给人看」就只是一句劝告，跳过去照样花钱。
+      const fingerprint = await specFingerprint(specPath, id);
+      const seen = await readSeen(engineDir);
+      const alreadyShown = Boolean(fingerprint && seen[fingerprint]);
+
+      if (!args.confirmed || !alreadyShown) {
         try {
           const { out } = await runCli(engineDir, ['plan', specPath, '--json'], { timeoutMs: 180_000 });
           const sb = lastJson(out);
           if (!sb) return { ok: false, error: '分镜表生成失败' };
+          // 记一笔：下次同一个 spec 带 confirmed 来，才放行
+          if (fingerprint) await markSeen(engineDir, fingerprint, { id, stage: 'shown' });
           return {
             ok: true,
             planned: true,
+            gate: args.confirmed ? 'not-seen' : null,
             storyboard: sb,
             hint: [
               '这份表没花钱。确认前先看完 warnings 和 problems。',

@@ -8,7 +8,7 @@
   "scripts": {
     "demo": "node src/cli.js demo",
     "render": "node src/cli.js render",
-    "test": "node test/smoke.mjs",
+    "test": "node test/smoke.mjs && node test/gate.mjs",
     "test:real": "node test/smoke.mjs --real"
   },
   "dependencies": {
