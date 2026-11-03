@@ -193,6 +193,10 @@ export function apply(ctx, config = {}) {
               `质检：${(value.qc?.checks || []).map((c) => `${c.ok ? '✓' : '✗'}${c.name}`).join(' ')}`,
               `画面：${value.images?.mode === 'ark' ? `方舟 ${value.images.model}（新生成 ${value.images.generated} / 缓存 ${value.images.cached}）` : `占位图（${value.images?.reason || '未配置'}）`}`,
               `配音：${JSON.stringify(value.voice || {})}`,
+              '',
+              '下一步不是交付，是看图。打开 imagesSheet 或逐张开 shot 里的 image，对比它旁边那句 narration：',
+              '  1) 这张图讲的是这句话吗；2) 有没有多出来的文字、水印、对话气泡；3) 主体有没有被切掉。',
+              '发现问题用 video_studio_scene 只重出那一镜。同一镜最多重出 2 次——两次还不对，是台词或描述的问题，改字而不是继续摇。',
             ].join('\n')
             : `渲染失败：${value.error || '未知错误'}`,
       }],

@@ -230,6 +230,13 @@ async function runDemo(demo, opts = {}) {
         duration: qc.duration, sizeMB: qc.sizeMB, frames: timeline.totalFrames,
         voice: stats, images: imageResult.stats, degraded, qc,
         scenes: timeline.scenes.map((s) => ({ id: s.id, start: +s.start.toFixed(2), end: +s.end.toFixed(2) })),
+        // 交付前要逐张看图：把台词和图并排给出去，省得再查一次
+        shots: project.scenes.map((s) => ({
+          id: s.id,
+          narration: s.narration,
+          image: path.join(imgDir, `${s.id}.jpg`),
+          voice: prepared.get(s.id)?.file || null,
+        })),
       };
       await writeJson(path.join(outDir, 'result.json'), result);
       await recordVersion(outDir, {

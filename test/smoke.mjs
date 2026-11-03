@@ -83,9 +83,12 @@ const voiceFiles = await Promise.all(spec.scenes.map(async (s) => {
 }));
 check('每镜都有有效配音', voiceFiles.every(Boolean), `${voiceFiles.filter(Boolean).length}/${voiceFiles.length}`);
 
-// 每镜都有图
+// 每镜都有图，且 shot 里把台词和图并排给出了（交付前看图的入口）
 const imgFiles = await Promise.all(spec.scenes.map((s) => exists(path.join(DIR, 'img', `${s.id}.jpg`))));
 check('每镜都有画面', imgFiles.every(Boolean), `${imgFiles.filter(Boolean).length}/${imgFiles.length}`);
+check('结果里带着「台词 + 图」清单', Array.isArray(result.shots)
+  && result.shots.length === spec.scenes.length
+  && result.shots.every((s) => s.narration && s.image));
 
 // 引擎记录：重渲要按它走，不能凭空变
 check('配音引擎已记录', !!project.voice.engineUsed, project.voice.engineUsed);
