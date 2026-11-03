@@ -4,6 +4,9 @@ import http from 'node:http';
 import { chromium } from 'playwright';
 
 const ROOT = path.resolve('.');
+// 渲染页只需要两样东西：舞台本身和项目素材。
+// 以前是整个仓库都对外服务，`GET /.env` 就能把 API Key 读走——本地端口也是端口。
+const ALLOW = ['/stage/', '/projects/'];
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -14,12 +17,21 @@ const MIME = {
   '.json': 'application/json',
 };
 
+/** 还原成绝对路径，并判断它是否落在允许的目录里 */
+function resolveAllowed(url) {
+  const file = path.resolve(ROOT, `.${url}`);
+  const rel = path.relative(ROOT, file);
+  if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) return null;
+  const asUrl = `/${rel.replace(/\\/g, '/')}`;
+  return ALLOW.some((p) => asUrl.startsWith(p)) ? file : null;
+}
+
 function startServer() {
   return new Promise((resolve) => {
     const server = http.createServer((req, res) => {
       const url = decodeURIComponent((req.url || '/').split('?')[0]);
-      const file = path.join(ROOT, url);
-      if (!file.startsWith(ROOT)) { res.writeHead(403); res.end(); return; }
+      const file = resolveAllowed(url);
+      if (!file) { res.writeHead(404); res.end('not found'); return; }
       fs.readFile(file, (err, data) => {
         if (err) { res.writeHead(404); res.end('not found'); return; }
         res.writeHead(200, {

@@ -68,11 +68,22 @@ async function recordVersion(outDir, entry) {
 
 /** 每镜一个渲染指纹：这一镜的时间轴/字幕/图层/图片。只有它变了，这一镜才重渲 */
 async function renderFingerprint(project, stageProject, imgDir) {
+  // 全局参数必须进指纹：改画幅、改调色、改字幕样式、换发布平台都会改变每一帧的样子，
+  // 但它们不在 scene 里。漏掉的话，改完这些再跑一遍会「全部命中缓存」，
+  // 输出和上一版一模一样，日志还写着「跳过 N 段」——改了个寂寞。
+  const global = sha1(JSON.stringify({
+    size: stageProject.size,
+    fps: stageProject.fps,
+    grade: stageProject.grade,
+    palette: stageProject.palette,
+    captionStyle: stageProject.captionStyle,
+    captionBottom: stageProject.captionBottom,
+  }));
   // 用图片内容而不是修改时间：缓存命中时会把文件重新拷一遍，mtime 每次都变
   const out = [];
   for (const [i, s] of project.scenes.entries()) {
     const buf = await fs.readFile(path.join(imgDir, `${s.id}.jpg`)).catch(() => null);
-    out.push(sha1(`${JSON.stringify(stageProject.scenes[i] || {})}|${buf ? sha1(buf) : 0}`));
+    out.push(sha1(`${global}|${JSON.stringify(stageProject.scenes[i] || {})}|${buf ? sha1(buf) : 0}`));
   }
   return out;
 }
@@ -217,7 +228,11 @@ async function runDemo(demo, opts = {}) {
         }
       }
       if (!coverOk) {
-        await grabFrame(stage.page, Math.min(1400, timeline.totalDuration * 400), coverFile);
+        // 兜底抽帧：取封面那镜的正中间，别永远停在 1.4 秒
+        const at = coverScene
+          ? coverScene.start + (coverScene.duration || 3) * 0.5
+          : Math.min(2, timeline.totalDuration * 0.5);
+        await grabFrame(stage.page, Math.max(0, at) * 1000, coverFile);
       }
 
       // 画面没全部用上模型，这条片子就不算成品——质检只看技术指标，看不出来
@@ -282,7 +297,11 @@ async function renderProject(projectFile, opts = {}) {
   const voiceDir = path.join(dir, 'voice');
   if (needTts) {
     log('  配音中…');
-    const { voices } = await synthesizeAll(project, voiceDir, { fallback: opts.fallback });
+    // 按上次实际用过的引擎走：项目里记的是 engineUsed，不是 engine。
+    // 只读 voice.engine 的话，一条 volc 的片子重渲后会静悄悄换成 edge，直接毁掉成片。
+    const engine = opts.engine || project.voice?.engineUsed || project.voice?.engine;
+    const { voices, engineUsed, fellBack } = await synthesizeAll(project, voiceDir, { fallback: opts.fallback, engine });
+    log(`  配音引擎：${engineUsed}${fellBack ? '（退回）' : ''}`);
     prepared = await prepareVoices(project, voices, workDir);
   } else {
     const { decodePcm } = await import('./util.js');
@@ -317,8 +336,12 @@ async function renderProject(projectFile, opts = {}) {
     await mixAudio({ voiceWav, bgm, total: timeline.totalDuration, out: mix, loudness: project.audio.loudness ?? -14, bgmGain: project.audio.bgmGain ?? -13 });
     const out = path.join(dir, 'out', `${project.id}.mp4`);
     await ensureDir(path.dirname(out));
+    // 和 build 一样先归档：重渲失败不能连带把上一版好成片一起送走
+    const archived = await archivePrevious(path.dirname(out), project.id);
+    if (archived) log(`  上一版已归档 → ${path.relative(process.cwd(), archived)}`);
     await mux(video, mix, out);
     const qc = await qcReport(out, { duration: timeline.totalDuration });
+    await writeJson(path.join(dir, 'out', 'qc.json'), qc);
     log(`\n✓ ${out}  ${qc.sizeMB}MB  ${qc.duration}s`);
   } finally {
     await stage.close();
@@ -381,9 +404,18 @@ async function rerenderScene(projectFile, opts = {}) {
   }
 
   // ④ 重拼 + 重封装
-  const names = (await fs.readdir(segDir)).filter((f) => /^seg_\d+\.mp4$/.test(f)).sort();
+  // 只拼「当前镜头表」对应的分段。seg 目录里可能还留着镜头数变少之前的旧段，
+  // 扫目录全拼进去会让成片比时间轴更长，而且没有任何地方会提前报错。
+  const segs = [];
+  for (let i = 0; i < project.scenes.length; i++) {
+    const f = path.join(segDir, `seg_${String(i).padStart(3, '0')}.mp4`);
+    if (!(await exists(f))) {
+      throw new Error(`缺少第 ${i + 1} 段分段文件（${path.basename(f)}）：镜头的数量或顺序变了，先完整跑一次 build`);
+    }
+    segs.push(f);
+  }
   const video = path.join(dir, 'work', 'video.mp4');
-  await concatSegments(names.map((f) => path.join(segDir, f)), video);
+  await concatSegments(segs, video);
   const out = path.join(dir, 'out', `${project.id}.mp4`);
   await mux(video, mixFile, out);
 

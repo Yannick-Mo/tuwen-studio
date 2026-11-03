@@ -115,6 +115,7 @@ export class VoiceEngine {
     this.piperModel = opts.piperModel || '.models/zh_CN-huayan-medium.onnx';
     this.engine = opts.engine || voice.engine || 'edge';
     this.volcRefs = new Map();
+    this.volcTags = new Map();
     this.stats = { edge: 0, piper: 0, sapi: 0, volc: 0, cache: 0 };
   }
 
@@ -134,6 +135,22 @@ export class VoiceEngine {
   volcRefFor(scene) {
     const ref = this.volcRefs.get(this.volcKey(scene));
     return ref ? [ref] : null;
+  }
+
+  /**
+   * 缓存标签：音色到底是谁。
+   * volc 的音色完全由参考音频决定，不是由 name/rate 决定——
+   * 只记「有没有参考图」的话，两个人说同一句台词会命中同一份缓存，直接串音；
+   * 换一个 reference 文件重做整条片子，也会拿到上一条的嗓子。
+   */
+  refTagFor(scene) {
+    if (this.engine !== 'volc') return 'base';
+    const b64 = this.volcRefs.get(this.volcKey(scene));
+    if (!b64) return 'none';
+    const k = this.volcKey(scene);
+    let tag = this.volcTags.get(k);
+    if (!tag) { tag = sha1(b64); this.volcTags.set(k, tag); }
+    return tag;
   }
 
   /** 第一次出声之后，把这段音频存成这个人的参考锚点 */
@@ -158,8 +175,7 @@ export class VoiceEngine {
     await ensureDir(outDir);
     await ensureDir(CACHE_DIR);
     const v = this.resolveVoice(scene);
-    const hasRef = this.engine === 'volc' && this.volcRefs.has(this.volcKey(scene));
-    const key = sha1(`${this.engine}|${v.provider}|${v.name}|${v.rate}|${v.pitch}|${scene.performance || ''}|${hasRef ? 'ref' : 'base'}|${scene.narration}`);
+    const key = sha1(`${this.engine}|${v.provider}|${v.name}|${v.rate}|${v.pitch}|${scene.performance || ''}|${this.refTagFor(scene)}|${scene.narration}`);
     const metaPath = path.join(CACHE_DIR, `${key}.json`);
 
     if (await exists(metaPath)) {

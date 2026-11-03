@@ -25,6 +25,14 @@ function sendJson(res, code, obj) {
   res.end(body);
 }
 
+/** 把 url 还原成文件路径，并确认它确实落在 base 目录里（防 ..%2f 之类的穿越） */
+function within(base, urlPath) {
+  const file = path.resolve(base, `.${urlPath}`);
+  const rel = path.relative(base, file);
+  if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) return null;
+  return file;
+}
+
 function serveFile(req, res, file) {
   const ext = path.extname(file).toLowerCase();
   const type = MIME[ext] || 'application/octet-stream';
@@ -126,14 +134,14 @@ export async function startStudio({ port = 7788, open = false } = {}) {
     try {
       if (p === '/' || p === '/studio') { serveFile(req, res, path.join(ROOT, 'studio', 'index.html')); return; }
       if (p.startsWith('/studio/')) {
-        const file = path.join(ROOT, p);
-        if (!file.startsWith(ROOT)) { res.writeHead(403); res.end(); return; }
+        const file = within(path.join(ROOT, 'studio'), p.slice('/studio'.length));
+        if (!file) { res.writeHead(404); res.end('not found'); return; }
         serveFile(req, res, file);
         return;
       }
       if (p.startsWith('/projects/')) {
-        const file = path.join(ROOT, p);
-        if (!file.startsWith(path.join(ROOT, 'projects'))) { res.writeHead(403); res.end(); return; }
+        const file = within(path.join(ROOT, 'projects'), p.slice('/projects'.length));
+        if (!file) { res.writeHead(404); res.end('not found'); return; }
         if (fs.existsSync(file) && fs.statSync(file).isFile()) { serveFile(req, res, file); return; }
         res.writeHead(404); res.end('not found');
         return;

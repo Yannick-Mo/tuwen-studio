@@ -99,7 +99,7 @@ export function apply(ctx, config = {}) {
           coverShot: { type: 'string', description: '封面用哪一镜的画面当底图，例如 "s1"；不填自动挑有角色的第一镜' },
           kicker: { type: 'string', description: '封面标题上方那行小字，例如「爽文 · 第 1 集」' },
           platform: { type: 'string', enum: ['douyin', 'xiaohongshu', 'wechat', 'bilibili', 'youtube'], description: '发布平台，决定字幕安全区（底部 UI 会盖住多少）。默认 douyin' },
-          aspect: { type: 'string', enum: ['9:16', '16:9', '3:4', '1:1'], description: '画幅，默认 9:16' },
+          aspect: { type: 'string', enum: ['9:16', '16:9'], description: '画幅：9:16 竖屏（默认）、16:9 横屏。只有这两种验证过，别用 1:1 / 3:4' },
           voice: {
             type: 'object',
             additionalProperties: true,

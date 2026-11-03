@@ -127,7 +127,10 @@ export function buildStoryboard(spec, opts = {}) {
   });
 
   const images = project.scenes.length;
-  const sheets = project.characters.length;
+  // 出图张数要按「真的出场过的角色」算：定义了但没用 cast 引用的不出设定图，
+  // 报多了会让人以为要多花这张的钱。
+  const used = new Set(project.scenes.flatMap((s) => s.cast || []));
+  const sheets = project.characters.filter((c) => used.has(c.id)).length;
   const totalSeconds = +timeline.totalDuration.toFixed(2);
   const frames = timeline.totalFrames;
 

@@ -64,7 +64,7 @@ export function shotFor(scene, index) {
 }
 
 /** 角色台词：外貌写死在每一镜的提示词里（L1），同时把定妆照当参考图传进去（L2） */
-function castLine(project, scene) {
+function castLine(project, scene, refCount) {
   const ids = scene.cast || [];
   if (!ids.length) return '';
   const chars = ids
@@ -76,6 +76,11 @@ function castLine(project, scene) {
     const pos = multi ? (i === 0 ? '左侧' : '右侧') : '';
     return `${pos ? `${pos}是` : ''}${c.name}（${c.look}${c.outfit ? `，${c.outfit}` : ''}）`;
   });
+  // 参考图没真的传进去时（没 key、配额用尽），不能还在提示词里承诺「参考图1就是该人物」：
+  // 模型照做不了，出图会既没有一致性、又照着错的指令猜。
+  if (refCount === 0) {
+    return `画面中的人物：${parts.join('；')}，五官、发型、服装、配饰必须完全一致`;
+  }
   const refMap = multi
     ? chars.map((c, i) => `参考图${i + 1}是${c.name}`).join('，') + '；两个人不能串脸'
     : '参考图1就是该人物';
@@ -84,13 +89,13 @@ function castLine(project, scene) {
   return `画面中的人物：${parts.join('；')}。${refMap}。${views}，五官、发型、伤疤、服装、配饰必须与参考图一致`;
 }
 
-export function buildPrompt(project, scene, index = 0) {
+export function buildPrompt(project, scene, index = 0, { refCount } = {}) {
   const subject = scene.visual?.subject || MOTIF_SUBJECT[scene.motif] || scene.narration || '';
   const hasCast = (scene.cast || []).length > 0;
   const shot = shotFor(scene, index);
   const framing = hasCast && !shot.custom ? shot.framing : '';
   const style = [project.style?.token, scene.visual?.style].filter(Boolean).join('，');
-  const cast = castLine(project, scene);
+  const cast = castLine(project, scene, refCount);
   const vertical = project.meta.aspect === '9:16';
   // 别写「底部留白」：模型会照字面画一条空白带。字幕安全区靠主体位置解决，不靠留白。
   const composition = project.style?.composition || (vertical
@@ -164,10 +169,10 @@ export async function generateOne({ project, scene, index, imgDir, prompt, seed,
   }
   const model = e.ARK_IMAGE_MODEL;
   const size = imageSizeFor(project, e);
-  const text = prompt || buildPrompt(project, scene, index);
   const s = seed ?? sceneSeed(scene, index);
   const refs = (scene.cast || []).map((id) => sheets?.get(id)).filter(Boolean);
   const refKey = refs.map((r) => r.key).join(',');
+  const text = prompt || buildPrompt(project, scene, index, { refCount: refs.length });
   const key = sha1(`${model}|${size}|${s}|${refKey}|${text}`);
   const cachedFile = path.join(CACHE_DIR, `${key}.jpg`);
   const dst = path.join(imgDir, `${scene.id}.jpg`);
@@ -204,10 +209,10 @@ export async function generateArkImages({ project, scenes, imgDir, env, sheets, 
 
   for (let i = 0; i < scenes.length; i++) {
     const scene = scenes[i];
-    const prompt = buildPrompt(project, scene, i);
     const seed = sceneSeed(scene, i);
     const refs = (scene.cast || []).map((id) => sheets?.get(id)).filter(Boolean);
     const refKey = refs.map((r) => r.key).join(',');
+    const prompt = buildPrompt(project, scene, i, { refCount: refs.length });
     const key = sha1(`${model}|${size}|${seed}|${refKey}|${prompt}`);
     const cachedFile = path.join(CACHE_DIR, `${key}.jpg`);
     const dst = path.join(imgDir, `${scene.id}.jpg`);
