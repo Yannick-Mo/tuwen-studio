@@ -51,7 +51,7 @@ node src/cli.js demo
 | 配音引擎 | `npm install`（msedge-tts，纯 Node） | 不需要 Python，也不用 `pip install` |
 | API Key | `tuwen setup` 页面里填 | 不填也能出片，但画面是占位图，不算成品 |
 
-**发给别人时**：`npm pack` 会打出一个约 134KB 的 tgz，除依赖外什么都带齐（`docs/`、`specs/`、`test/`）。
+**发给别人时**：`npm pack` 会打出一个约 165KB 的 tgz，除依赖外什么都带齐（`docs/`、`specs/`、`test/`、图标）。
 对方 `npm i <tgz>` 之后跑 `tuwen doctor` 就够了。插件单独装：`node scripts/install-plugin.mjs`。
 
 要发到 DSH 插件市场，看 [docs/PUBLISH.md](docs/PUBLISH.md)——机制、要改成什么样、要提什么 PR，都写在那里面。
