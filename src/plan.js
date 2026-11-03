@@ -88,6 +88,9 @@ export function buildStoryboard(spec, opts = {}) {
     const p = c.voice?.preset;
     if (c.voice && !p && !c.voice.name) warnings.push(`角色 ${c.id} 的 voice 既没 preset 也没 name，会退回项目嗓子`);
     if (p && !VOICE_PRESETS[p]) warnings.push(`角色 ${c.id} 的 voice.preset 不认识：${p}`);
+    if (!project.scenes.some((s) => (s.cast || []).includes(c.id))) {
+      warnings.push(`角色 ${c.id} 定义了但没有任何镜头用 cast 引用，不会给它出设定图`);
+    }
   }
 
   // 有真实配音就用真实时长，没有再退回估算

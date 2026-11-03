@@ -106,7 +106,11 @@ export function buildPrompt(project, scene, index = 0) {
 
 /** 角色定妆照：一次生成，之后每镜当参考图用 */
 export async function ensureCharacterSheets({ project, dir, env }) {
-  const chars = project.characters || [];
+  // 只给真的在某个镜头里出现过的角色出资产。
+  // 定义了但一场戏都没用上的，出一张图纯属浪费额度。
+  const used = new Set();
+  for (const s of project.scenes || []) for (const id of s.cast || []) used.add(id);
+  const chars = (project.characters || []).filter((c) => used.has(c.id));
   const map = new Map();
   if (!chars.length) return map;
 
