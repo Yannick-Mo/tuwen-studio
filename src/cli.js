@@ -14,6 +14,7 @@ import { openStage, mount, grabFrame } from './stage.js';
 import { pickImages, generateOne, ensureCharacterSheets } from './images.js';
 import { qcReport, contactSheet, imageSheet } from './qc.js';
 import { makeCover, pickCoverScene } from './cover.js';
+import { buildSrt } from './subtitles.js';
 import { ensureDir, exists, loadEnv, decodePcm, log, writeJson, sha1 } from './util.js';
 import { DEMO, buildProject, withSubjects } from './demo.js';
 import { buildStoryboard, formatStoryboard, measureVoices } from './plan.js';
@@ -66,6 +67,55 @@ async function recordVersion(outDir, entry) {
   await writeJson(f, list);
 }
 
+/**
+ * 回到上一个版本。--to=1 是上一版，--to=2 是上上一版。
+ * 换之前先把当前这版也归档，所以「回退」和「反悔」是同一条命令——试错的成本是一次复制。
+ */
+async function restoreVersion(projectFile, { to = 1 } = {}) {
+  const file = path.resolve(projectFile);
+  const dir = path.dirname(file);
+  const project = normalizeProject(JSON.parse(await fs.readFile(file, 'utf8')));
+  const outDir = path.join(dir, 'out');
+  const hist = path.join(outDir, 'history');
+  const versions = (await fs.readdir(hist).catch(() => [])).filter((f) => f.endsWith('.mp4')).sort();
+  const step = Math.max(1, Number(to) || 1);
+  if (versions.length < step) {
+    throw new Error(`历史里只有 ${versions.length} 版，回不到第 ${step} 步之前（每重渲一次才会存一版）`);
+  }
+  const src = path.join(hist, versions[versions.length - step]);
+  const out = path.join(outDir, `${project.id}.mp4`);
+
+  const archived = await archivePrevious(outDir, project.id);
+  await fs.copyFile(src, out);
+
+  const qc = await qcReport(out, { duration: project.timeline?.totalDuration });
+  await writeJson(path.join(outDir, 'qc.json'), qc);
+  const resultPath = path.join(outDir, 'result.json');
+  try {
+    const r = JSON.parse(await fs.readFile(resultPath, 'utf8'));
+    r.sizeMB = qc.sizeMB;
+    r.duration = qc.duration;
+    r.qc = qc;
+    r.restoredFrom = path.basename(src);
+    await writeJson(resultPath, r);
+  } catch { /* 没有旧结果就算了 */ }
+  await recordVersion(outDir, {
+    at: new Date().toISOString(), duration: qc.duration, sizeMB: qc.sizeMB,
+    ok: qc.ok, restored: path.basename(src),
+  });
+
+  return {
+    ok: qc.ok,
+    id: project.id,
+    restored: src,
+    archivedCurrent: archived,
+    ageSteps: step,
+    duration: qc.duration,
+    out,
+    qc,
+  };
+}
+
 /** 每镜一个渲染指纹：这一镜的时间轴/字幕/图层/图片。只有它变了，这一镜才重渲 */
 async function renderFingerprint(project, stageProject, imgDir) {
   // 全局参数必须进指纹：改画幅、改调色、改字幕样式、换发布平台都会改变每一帧的样子，
@@ -78,6 +128,8 @@ async function renderFingerprint(project, stageProject, imgDir) {
     palette: stageProject.palette,
     captionStyle: stageProject.captionStyle,
     captionBottom: stageProject.captionBottom,
+    // 码率也进指纹：只改 crf 不重渲的话，输出画质不会变，等于改了没用
+    crf: stageProject.deliver?.crf ?? 20,
   }));
   // 用图片内容而不是修改时间：缓存命中时会把文件重新拷一遍，mtime 每次都变
   const out = [];
@@ -171,7 +223,7 @@ async function runDemo(demo, opts = {}) {
 
     const segs = await encodeParallel(pages, ranges, project.meta.fps, segDir, (d, t) => {
       if (d % 30 === 0 || d === t) log(`   ${String(Math.round((d / t) * 100)).padStart(3)}%  ${d}/${t} 帧  ${el()}`);
-    }, { fingerprints: fingerprint });
+    }, { fingerprints: fingerprint, crf: project.deliver?.crf ?? 20 });
     const video = path.join(workDir, 'video.mp4');
     await concatSegments(segs, video);
 
@@ -204,13 +256,25 @@ async function runDemo(demo, opts = {}) {
       const sheet = path.join(outDir, 'contact-sheet.jpg');
       await contactSheet(out, sheet);
 
+      // 软字幕：和烧进画面的那份同一套时间轴，平台要传字幕时直接给这个文件
+      let srt = null;
+      if (project.deliver?.srt !== false) {
+        const body = buildSrt(project);
+        if (body) {
+          srt = path.join(outDir, `${demo.id}.srt`);
+          await fs.writeFile(srt, `${body}\n`, 'utf8');
+          log(`  软字幕 → ${path.relative(process.cwd(), srt)}`);
+        }
+      }
+
       // 封面：拿指定镜头的画面当底，压暗之后把标题放上去，比抽帧靠谱
       const coverFile = path.join(outDir, 'cover.jpg');
+      const wantCover = project.deliver?.cover !== false;
       const coverScene = (project.scenes || []).find((s) => s.id === project.meta.coverShot)
         || pickCoverScene(project);
       const coverSrc = coverScene ? path.join(imgDir, `${coverScene.id}.jpg`) : null;
       let coverOk = false;
-      if (coverSrc && (await exists(coverSrc))) {
+      if (wantCover && coverSrc && (await exists(coverSrc))) {
         try {
           const coverPage = await stage.browser.newPage();
           await makeCover(coverPage, {
@@ -227,7 +291,7 @@ async function runDemo(demo, opts = {}) {
           log(`  ! 封面生成失败：${String(e.message).slice(0, 80)}`);
         }
       }
-      if (!coverOk) {
+      if (wantCover && !coverOk) {
         // 兜底抽帧：取封面那镜的正中间，别永远停在 1.4 秒
         const at = coverScene
           ? coverScene.start + (coverScene.duration || 3) * 0.5
@@ -241,7 +305,9 @@ async function runDemo(demo, opts = {}) {
         ok: qc.ok && !degraded,
         id: demo.id,
         title: project.meta.title,
-        out, cover: path.join(outDir, 'cover.jpg'), sheet, imagesSheet,
+        out, srt,
+        cover: wantCover ? coverFile : null,
+        sheet, imagesSheet,
         duration: qc.duration, sizeMB: qc.sizeMB, frames: timeline.totalFrames,
         voice: stats, images: imageResult.stats, degraded, qc,
         scenes: timeline.scenes.map((s) => ({ id: s.id, start: +s.start.toFixed(2), end: +s.end.toFixed(2) })),
@@ -269,7 +335,8 @@ async function runDemo(demo, opts = {}) {
       }
 
       log(`\n✓ 成片 ${path.relative(process.cwd(), out)}  ${qc.sizeMB}MB  ${qc.duration}s  ${el()}`);
-      log(`  封面 ${path.relative(process.cwd(), path.join(outDir, 'cover.jpg'))}`);
+      if (result.cover) log(`  封面 ${path.relative(process.cwd(), result.cover)}`);
+      if (result.srt) log(`  软字幕 ${path.relative(process.cwd(), result.srt)}`);
       log(`  联系表 ${path.relative(process.cwd(), sheet)}`);
       return result;
     } else {
@@ -326,7 +393,7 @@ async function renderProject(projectFile, opts = {}) {
     for (const p of pages) await mount(p, stageProject);
     const segs = await encodeParallel(pages, timeline.ranges, project.meta.fps, path.join(workDir, 'seg'), (d, t) => {
       if (d % 60 === 0 || d === t) log(`   ${String(Math.round((d / t) * 100)).padStart(3)}%`);
-    }, { fingerprints: fingerprint });
+    }, { fingerprints: fingerprint, crf: project.deliver?.crf ?? 20 });
     const video = path.join(workDir, 'video.mp4');
     await concatSegments(segs, video);
     const voiceWav = path.join(workDir, 'voice.wav');
@@ -342,6 +409,10 @@ async function renderProject(projectFile, opts = {}) {
     await mux(video, mix, out);
     const qc = await qcReport(out, { duration: timeline.totalDuration });
     await writeJson(path.join(dir, 'out', 'qc.json'), qc);
+    if (project.deliver?.srt !== false) {
+      const body = buildSrt(project);
+      if (body) await fs.writeFile(path.join(dir, 'out', `${project.id}.srt`), `${body}\n`, 'utf8');
+    }
     log(`\n✓ ${out}  ${qc.sizeMB}MB  ${qc.duration}s`);
   } finally {
     await stage.close();
@@ -398,7 +469,7 @@ async function rerenderScene(projectFile, opts = {}) {
   const stage = await openStage({ width, height });
   try {
     await mount(stage.page, toStageProject(project));
-    await encodeRange(stage.page, { index: idx, fromFrame, toFrame }, fps, segFile, null);
+    await encodeRange(stage.page, { index: idx, fromFrame, toFrame }, fps, segFile, null, { crf: project.deliver?.crf ?? 20 });
   } finally {
     await stage.close();
   }
@@ -422,19 +493,30 @@ async function rerenderScene(projectFile, opts = {}) {
   // ⑤ 写回 project.json（下次整体重跑也能复现这张图）
   await writeJson(file, project);
 
+  // 顺手重导一次软字幕：项目可能被手改过，别让 SRT 和画面上的字幕对不上
+  let srt = null;
+  if (project.deliver?.srt !== false) {
+    const body = buildSrt(project);
+    if (body) {
+      srt = path.join(dir, 'out', `${project.id}.srt`);
+      await fs.writeFile(srt, `${body}\n`, 'utf8');
+    }
+  }
+
   const qc = await qcReport(out, { duration: project.timeline?.totalDuration });
   const resultPath = path.join(dir, 'out', 'result.json');
   try {
     const r = JSON.parse(await fs.readFile(resultPath, 'utf8'));
     r.sizeMB = qc.sizeMB;
     r.qc = qc;
+    if (srt) r.srt = srt;
     r.lastSceneRender = { scene: scene.id, at: new Date().toISOString(), image: image?.mode || 'unchanged' };
     await writeJson(resultPath, r);
   } catch { /* 没有旧结果就算了 */ }
 
   return {
     ok: qc.ok, scene: scene.id, frames: toFrame - fromFrame,
-    out, image, qc,
+    out, srt, image, qc,
   };
 }
 
@@ -575,6 +657,10 @@ try {
       noImage: !!(args['no-image'] || args.noImage),
     });
     console.log(JSON.stringify(r));
+  } else if (cmd === 'restore') {
+    if (!positional[0]) throw new Error('用法: tuwen restore <project.json> [--to=1]');
+    const r = await restoreVersion(positional[0], { to: args.to });
+    console.log(JSON.stringify(r));
   } else if (cmd === 'frames') {
     if (!positional[0]) throw new Error('用法: tuwen frames <project.json> --times=1,3.5,6');
     const times = String(args.times || '1,3,5').split(',').map(Number).filter((n) => Number.isFinite(n) && n >= 0);
@@ -599,6 +685,7 @@ try {
   node src/cli.js scene <p.json> --id=s3  只改一镜（重出图 + 只重渲这一段）
   node src/cli.js render <project.json>   只重渲已有项目（图/音已就绪）
   node src/cli.js frames <p.json> --times=1,3.5   取静帧审片
+  node src/cli.js restore <p.json> --to=1  回到上一个成片版本（回退也能反悔）
   node src/cli.js studio                  打开本地工作台（分镜 / 预览 / 单镜重渲）
   node src/cli.js list                    列出项目
 

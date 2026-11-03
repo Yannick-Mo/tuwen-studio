@@ -16,13 +16,13 @@ function writeAsync(stream, buf) {
   });
 }
 
-async function encodeSegment(page, fromFrame, count, fps, file, onFrame) {
+async function encodeSegment(page, fromFrame, count, fps, file, onFrame, { crf = 20 } = {}) {
   // 先写 .part 再改名：中途被杀，不会留下一个「看起来完整」的坏段
   const part = `${file}.part`;
   const args = [
     '-y', '-hide_banner', '-loglevel', 'error',
     '-f', 'image2pipe', '-vcodec', 'mjpeg', '-framerate', String(fps), '-i', '-',
-    '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20',
+    '-c:v', 'libx264', '-preset', 'veryfast', '-crf', String(crf),
     '-pix_fmt', 'yuv420p', '-r', String(fps), '-g', String(fps * 2),
     '-an', '-f', 'mp4', part,
   ];
@@ -80,6 +80,7 @@ export async function encodeParallel(pages, ranges, fps, outDir, onProgress, opt
     loads[i] += r.toFrame - r.fromFrame;
   }
 
+  const crf = opts.crf ?? 20;
   let done = 0;
   await Promise.all(groups.map((g, i) => (async () => {
     for (const r of g) {
@@ -87,7 +88,7 @@ export async function encodeParallel(pages, ranges, fps, outDir, onProgress, opt
       await encodeSegment(pages[i], r.fromFrame, r.toFrame - r.fromFrame, fps, file, () => {
         done++;
         if (onProgress && (done % 30 === 0 || done === total)) onProgress(done, total);
-      });
+      }, { crf });
       // 每渲完一段就记一笔，崩了也能从这里接着来
       if (wanted.length) {
         saved[String(r.index)] = wanted[r.index];
@@ -104,10 +105,10 @@ export async function encodeRanges(page, ranges, fps, outDir, onProgress) {
 }
 
 /** 只编一段（改一镜时用） */
-export async function encodeRange(page, range, fps, outFile, onFrame) {
+export async function encodeRange(page, range, fps, outFile, onFrame, opts = {}) {
   const count = range.toFrame - range.fromFrame;
   if (count <= 0) throw new Error('这一段没有帧');
-  await encodeSegment(page, range.fromFrame, count, fps, outFile, onFrame);
+  await encodeSegment(page, range.fromFrame, count, fps, outFile, onFrame, opts);
   return outFile;
 }
 

@@ -94,7 +94,9 @@ const DEFAULTS = {
   lang: 'zh-CN',
   voice: { provider: 'edge', name: 'zh-CN-YunxiNeural', rate: '+4%', pitch: '+0Hz' },
   audio: { bgm: null, bgmGain: -9, duck: true, loudness: -14, tailFade: 0.6 },
-  deliver: { burnSubtitles: true, cover: true, srt: true, aigcLabel: true, crf: 18 },
+  // 这几项是真的会被读的：burnSubtitles 关掉就不挂字幕层、cover 关掉就不出封面、
+  // srt 关掉就不导软字幕、crf 直接进 x264。别再往里加没人读的开关。
+  deliver: { burnSubtitles: true, cover: true, srt: true, crf: 20 },
 };
 
 export function normalizeProject(raw) {
@@ -222,7 +224,8 @@ export function toStageProject(project) {
       start: s.start,
       duration: s.duration,
       layers: s.layers,
-      captions: s.captions,
+      // 关掉硬字幕时字幕层完全不挂载，方便自己后期叠字；SRT 照常导
+      captions: project.deliver.burnSubtitles === false ? [] : s.captions,
       fx: s.fx,
       transitionOut: s.transitionOut,
     })),

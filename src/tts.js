@@ -7,6 +7,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { ensureDir, exists, ffprobe, run, sha1, log } from './util.js';
+import { VOICE_PRESETS } from './schema.js';
 
 const CACHE_DIR = path.resolve('.cache/tts');
 const BLOCK_FILE = path.resolve('.cache/edge-blocked.json');
@@ -121,7 +122,12 @@ export class VoiceEngine {
 
   /** 项目级嗓子 + 镜头级覆盖，合并成这一句的实际发音参数 */
   resolveVoice(scene) {
-    const v = { ...this.voice, ...(scene?.voice || {}) };
+    // 镜头级 voice 也可以写 preset。不解析的话 preset 会被静默忽略，
+    // 结果是用回项目嗓子——用户以为换了个人在念，其实没有。
+    const patch = scene?.voice?.preset && VOICE_PRESETS[scene.voice.preset]
+      ? { ...VOICE_PRESETS[scene.voice.preset], ...scene.voice }
+      : (scene?.voice || {});
+    const v = { ...this.voice, ...patch };
     const r = Number.parseInt(v.rate ?? '0', 10) || 0;
     v.lengthScale = v.lengthScale ?? 1 / (1 + r / 100);
     return v;

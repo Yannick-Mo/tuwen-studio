@@ -14,13 +14,15 @@
       "framing": "",
       "subject": "巨大的黑洞侧视，吸积盘像一条炽热的光带横穿画面，背景是深蓝星场",
       "cast": [],
+      "speaker": "",
       "voice": {
         "rate": "+1%",
         "pitch": "-2Hz",
-        "delivery": "open"
+        "delivery": "open",
+        "name": ""
       },
       "transition": "zoom-blur 0.5s",
-      "prompt": "超广角大全景，环境占画面主导，人物是画面里的一个小点，巨大的黑洞侧视，吸积盘像一条炽热的光带横穿画面，背景是深蓝星场，cinematic sci-fi illustration, deep navy and amber, volumetric light, ultra detailed，竖屏 9:16 构图，主体位于画面中上部，底部三分之一保持简洁以便叠加字幕，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
+      "prompt": "超广角大全景，环境占画面主导，人物是画面里的一个小点，巨大的黑洞侧视，吸积盘像一条炽热的光带横穿画面，背景是深蓝星场，cinematic sci-fi illustration, deep navy and amber, volumetric light, ultra detailed，竖屏 9:16 构图，主体位于画面中上部，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
     },
     {
       "index": 2,
@@ -32,9 +34,10 @@
       "framing": "",
       "subject": "极其靠近黑洞边缘的视角，光线被引力弯折成一道细亮环，四周是深蓝星云",
       "cast": [],
+      "speaker": "",
       "voice": null,
       "transition": "crossfade 0.45s",
-      "prompt": "中景，前中后景层次分明，极其靠近黑洞边缘的视角，光线被引力弯折成一道细亮环，四周是深蓝星云，cinematic sci-fi illustration, deep navy and amber, volumetric light, ultra detailed，竖屏 9:16 构图，主体位于画面中上部，底部三分之一保持简洁以便叠加字幕，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
+      "prompt": "中景，前中后景层次分明，极其靠近黑洞边缘的视角，光线被引力弯折成一道细亮环，四周是深蓝星云，cinematic sci-fi illustration, deep navy and amber, volumetric light, ultra detailed，竖屏 9:16 构图，主体位于画面中上部，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
     },
     {
       "index": 3,
@@ -46,9 +49,10 @@
       "framing": "",
       "subject": "一颗恒星在坍缩瞬间爆炸，外层物质被抛向四周，中心塌陷成黑点",
       "cast": [],
+      "speaker": "",
       "voice": null,
       "transition": "whip-pan 0.42s",
-      "prompt": "特写，局部细节占满画面，质感强烈，一颗恒星在坍缩瞬间爆炸，外层物质被抛向四周，中心塌陷成黑点，cinematic sci-fi illustration, deep navy and amber, volumetric light, ultra detailed，竖屏 9:16 构图，主体位于画面中上部，底部三分之一保持简洁以便叠加字幕，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
+      "prompt": "特写，局部细节占满画面，质感强烈，一颗恒星在坍缩瞬间爆炸，外层物质被抛向四周，中心塌陷成黑点，cinematic sci-fi illustration, deep navy and amber, volumetric light, ultra detailed，竖屏 9:16 构图，主体位于画面中上部，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
     },
     {
       "index": 4,
@@ -60,9 +64,10 @@
       "framing": "",
       "subject": "望远镜拍下的黑洞照片质感：模糊的橙红色圆环，明显颗粒与噪点，类似胶片扫描",
       "cast": [],
+      "speaker": "",
       "voice": null,
       "transition": "crossfade 0.45s",
-      "prompt": "低角度仰拍，主体压向画面上方，有压迫感，望远镜拍下的黑洞照片质感：模糊的橙红色圆环，明显颗粒与噪点，类似胶片扫描，cinematic sci-fi illustration, deep navy and amber, volumetric light, ultra detailed，竖屏 9:16 构图，主体位于画面中上部，底部三分之一保持简洁以便叠加字幕，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
+      "prompt": "低角度仰拍，主体压向画面上方，有压迫感，望远镜拍下的黑洞照片质感：模糊的橙红色圆环，明显颗粒与噪点，类似胶片扫描，cinematic sci-fi illustration, deep navy and amber, volumetric light, ultra detailed，竖屏 9:16 构图，主体位于画面中上部，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
     },
     {
       "index": 5,
@@ -74,9 +79,10 @@
       "framing": "",
       "subject": "银河系全景，旋臂铺满整个画面，中心核球过曝发白",
       "cast": [],
+      "speaker": "",
       "voice": null,
       "transition": "zoom-blur 0.5s",
-      "prompt": "高角度俯视，构图对称，留出大面积负空间，银河系全景，旋臂铺满整个画面，中心核球过曝发白，cinematic sci-fi illustration, deep navy and amber, volumetric light, ultra detailed，竖屏 9:16 构图，主体位于画面中上部，底部三分之一保持简洁以便叠加字幕，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
+      "prompt": "高角度俯视，构图对称，留出大面积负空间，银河系全景，旋臂铺满整个画面，中心核球过曝发白，cinematic sci-fi illustration, deep navy and amber, volumetric light, ultra detailed，竖屏 9:16 构图，主体位于画面中上部，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
     },
     {
       "index": 6,
@@ -88,13 +94,15 @@
       "framing": "",
       "subject": "一条被拉长的发光物质流正被拖进黑暗中心，周围几乎没有星光",
       "cast": [],
+      "speaker": "",
       "voice": {
         "rate": "+11%",
         "pitch": "+1Hz",
-        "delivery": "build"
+        "delivery": "build",
+        "name": ""
       },
       "transition": "whip-pan 0.4s",
-      "prompt": "超广角大全景，环境占画面主导，人物是画面里的一个小点，一条被拉长的发光物质流正被拖进黑暗中心，周围几乎没有星光，cinematic sci-fi illustration, deep navy and amber, volumetric light, ultra detailed，竖屏 9:16 构图，主体位于画面中上部，底部三分之一保持简洁以便叠加字幕，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
+      "prompt": "超广角大全景，环境占画面主导，人物是画面里的一个小点，一条被拉长的发光物质流正被拖进黑暗中心，周围几乎没有星光，cinematic sci-fi illustration, deep navy and amber, volumetric light, ultra detailed，竖屏 9:16 构图，主体位于画面中上部，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
     },
     {
       "index": 7,
@@ -106,13 +114,15 @@
       "framing": "",
       "subject": "行星地平线特写，蓝色大气层发出辉光，上方是深空",
       "cast": [],
+      "speaker": "",
       "voice": {
         "rate": "-1%",
         "pitch": "+0Hz",
-        "delivery": "close"
+        "delivery": "close",
+        "name": ""
       },
       "transition": "flash 0.4s",
-      "prompt": "中景，前中后景层次分明，行星地平线特写，蓝色大气层发出辉光，上方是深空，cinematic sci-fi illustration, deep navy and amber, volumetric light, ultra detailed，竖屏 9:16 构图，主体位于画面中上部，底部三分之一保持简洁以便叠加字幕，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
+      "prompt": "中景，前中后景层次分明，行星地平线特写，蓝色大气层发出辉光，上方是深空，cinematic sci-fi illustration, deep navy and amber, volumetric light, ultra detailed，竖屏 9:16 构图，主体位于画面中上部，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
     }
   ],
   "totals": {

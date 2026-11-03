@@ -109,12 +109,22 @@ async function loadProject(id) {
   };
 }
 
+/** 超时要把整棵进程树收掉：ffmpeg/chromium 是子进程，只杀 node 会让它们留在后台 */
+function killTree(child) {
+  if (!child || !child.pid) return;
+  if (process.platform === 'win32') {
+    try { spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], { windowsHide: true, stdio: 'ignore' }); } catch { /* 尽力而为 */ }
+  } else {
+    try { process.kill(-child.pid, 'SIGKILL'); } catch { try { child.kill('SIGKILL'); } catch { /* 尽力而为 */ } }
+  }
+}
+
 function runCli(args, timeoutMs) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [path.join(ROOT, 'src', 'cli.js'), ...args], { cwd: ROOT, windowsHide: true });
     let out = '';
     let err = '';
-    const timer = setTimeout(() => { child.kill(); reject(new Error('超时')); }, timeoutMs);
+    const timer = setTimeout(() => { killTree(child); reject(new Error('超时')); }, timeoutMs);
     child.stdout.on('data', (d) => { out += d; });
     child.stderr.on('data', (d) => { err += d; });
     child.on('error', reject);

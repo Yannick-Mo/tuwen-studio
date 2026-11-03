@@ -17,6 +17,20 @@ function resolveEngine(config) {
   return candidates[0];
 }
 
+/**
+ * 超时只 kill 掉 node 是不够的：ffmpeg 和 chromium 是它的子进程，
+ * 会留在后台继续吃 CPU、继续写文件，下一次渲染就会莫名变慢甚至互相踩。
+ * Windows 上要用 taskkill /T 连整棵树一起收。
+ */
+function killTree(child) {
+  if (!child || !child.pid) return;
+  if (process.platform === 'win32') {
+    try { spawn('taskkill', ['/pid', String(child.pid), '/T', '/F'], { windowsHide: true, stdio: 'ignore' }); } catch { /* 尽力而为 */ }
+  } else {
+    try { process.kill(-child.pid, 'SIGKILL'); } catch { try { child.kill('SIGKILL'); } catch { /* 尽力而为 */ } }
+  }
+}
+
 function runCli(engineDir, args, { timeoutMs }) {
   const cli = path.join(engineDir, 'src', 'cli.js');
   return new Promise((resolve, reject) => {
@@ -28,7 +42,7 @@ function runCli(engineDir, args, { timeoutMs }) {
     let out = '';
     let err = '';
     const timer = setTimeout(() => {
-      child.kill();
+      killTree(child);
       reject(new Error(`渲染超时（${Math.round(timeoutMs / 60000)} 分钟）。可以调小 --jobs 或拆成更短的项目。`));
     }, timeoutMs);
     child.stdout.on('data', (d) => { out += d.toString(); });
@@ -188,7 +202,8 @@ export function apply(ctx, config = {}) {
             ? [
               `成片：${value.out}`,
               `${value.duration}s / ${value.sizeMB}MB / ${value.frames} 帧`,
-              `封面：${value.cover}`,
+              value.cover ? `封面：${value.cover}` : '封面：本次未出',
+              value.srt ? `软字幕：${value.srt}` : null,
               `联系表：${value.sheet}`,
               `质检：${(value.qc?.checks || []).map((c) => `${c.ok ? '✓' : '✗'}${c.name}`).join(' ')}`,
               `画面：${value.images?.mode === 'ark' ? `方舟 ${value.images.model}（新生成 ${value.images.generated} / 缓存 ${value.images.cached}）` : `占位图（${value.images?.reason || '未配置'}）`}`,
@@ -197,7 +212,8 @@ export function apply(ctx, config = {}) {
               '下一步不是交付，是看图。打开 imagesSheet 或逐张开 shot 里的 image，对比它旁边那句 narration：',
               '  1) 这张图讲的是这句话吗；2) 有没有多出来的文字、水印、对话气泡；3) 主体有没有被切掉。',
               '发现问题用 video_studio_scene 只重出那一镜。同一镜最多重出 2 次——两次还不对，是台词或描述的问题，改字而不是继续摇。',
-            ].join('\n')
+              '改坏了想退回上一版：让用户在项目目录跑 node src/cli.js restore projects/<id>/project.json --to=1。',
+            ].filter((x) => x !== null).join('\n')
             : `渲染失败：${value.error || '未知错误'}`,
       }],
     },

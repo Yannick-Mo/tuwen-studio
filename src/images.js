@@ -5,7 +5,7 @@
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { sha1, ensureDir, exists, log, loadEnv, ffprobe } from './util.js';
+import { sha1, ensureDir, exists, log, loadEnv, ffprobe, run } from './util.js';
 import { generateArk, arkAvailable, ImageError } from './providers/ark.js';
 import { ASPECTS } from './schema.js';
 
@@ -143,10 +143,10 @@ export async function ensureCharacterSheets({ project, dir, env }) {
     if (!(await exists(cachedFile))) {
       if (!arkAvailable(e)) continue;
       const out = await generateArk({ apiKey: e.ARK_API_KEY, baseURL: e.ARK_BASE_URL, model, prompt, size, seed: 7 });
-      await fs.writeFile(cachedFile, out.buffer);
+      await saveVerified(out.buffer, cachedFile);
       log(`  · 角色设定图 ${c.name}（四视图）  ${(out.buffer.length / 1024).toFixed(0)}KB`);
     }
-    await fs.copyFile(cachedFile, dst);
+    await saveVerified(await fs.readFile(cachedFile), dst);
     const b64 = (await fs.readFile(dst)).toString('base64');
     map.set(c.id, { file: dst, ref: `data:image/jpeg;base64,${b64}`, key, prompt });
   }
@@ -178,14 +178,14 @@ export async function generateOne({ project, scene, index, imgDir, prompt, seed,
   const dst = path.join(imgDir, `${scene.id}.jpg`);
 
   if (await exists(cachedFile)) {
-    await fs.copyFile(cachedFile, dst);
+    await saveVerified(await fs.readFile(cachedFile), dst);
     return { file: dst, prompt: text, seed: s, cached: true, size };
   }
   const out = await generateArk({
     apiKey: e.ARK_API_KEY, baseURL: e.ARK_BASE_URL, model, prompt: text, size, seed: s,
     image: refs.map((r) => r.ref),
   });
-  await fs.writeFile(dst, out.buffer);
+  await saveVerified(out.buffer, dst);
   await fs.writeFile(cachedFile, out.buffer);
   await fs.writeFile(`${cachedFile}.json`, JSON.stringify({ prompt: text, model, size, seed: s, cast: scene.cast || [], at: new Date().toISOString() }, null, 2));
   return { file: dst, prompt: text, seed: s, cached: false, size: out.meta.size };
@@ -217,29 +217,42 @@ export async function generateArkImages({ project, scenes, imgDir, env, sheets, 
     const cachedFile = path.join(CACHE_DIR, `${key}.jpg`);
     const dst = path.join(imgDir, `${scene.id}.jpg`);
 
+    // 缓存里的图也验一遍：缓存坏了会一路坏到成片里，而且再也长不好
     if (await exists(cachedFile)) {
-      await fs.copyFile(cachedFile, dst);
-      cached++;
-      files.push(dst);
-      continue;
+      try {
+        await saveVerified(await fs.readFile(cachedFile), dst);
+        cached++;
+        files.push(dst);
+        continue;
+      } catch (e) {
+        log(`  · ${scene.id} 缓存里的图已损坏（${String(e.message).slice(0, 40)}），重新生成`);
+        await fs.rm(cachedFile, { force: true }).catch(() => {});
+        await fs.rm(`${cachedFile}.json`, { force: true }).catch(() => {});
+      }
     }
 
     let out = null;
+    let busted = null;
     for (let attempt = 0; attempt < 2 && !out; attempt++) {
       try {
-        out = await generateArk({
+        const got = await generateArk({
           apiKey: env.ARK_API_KEY, baseURL: env.ARK_BASE_URL, model, prompt, size,
           seed: seed + attempt * 1013,
           image: refs.map((r) => r.ref),
         });
+        // 写盘时就校验：解不开的图当作这次尝试失败，换种子重来一次
+        await saveVerified(got.buffer, dst);
+        out = got;
       } catch (e) {
         const code = e.code || 'unknown';
-        // 内容审核带概率性：换种子重试一次，多数能过
-        if (attempt === 0 && (code === 'content' || code === 'network')) {
-          log(`  · ${scene.id} ${code === 'content' ? '被审核拦了一次' : '网络抖了一下'}，换种子重试`);
+        // 内容审核带概率性、网络会抖、个别图会坏：换种子重试一次，多数能过
+        if (attempt === 0 && (code === 'content' || code === 'network' || code === 'bad-image')) {
+          log(`  · ${scene.id} ${code === 'content' ? '被审核拦了一次'
+            : code === 'bad-image' ? '出了一张坏图' : '网络抖了一下'}，换种子重试`);
           continue;
         }
-        failed.push({ id: scene.id, code, message: String(e.message).slice(0, 200) });
+        busted = { code, message: String(e.message).slice(0, 200) };
+        failed.push({ id: scene.id, ...busted });
         log(`  ! ${scene.id} 出图失败（${code}）${String(e.message).slice(0, 80)}`);
       }
     }
@@ -247,7 +260,6 @@ export async function generateArkImages({ project, scenes, imgDir, env, sheets, 
       files.push(dst);
       continue;
     }
-    await fs.writeFile(dst, out.buffer);
     await fs.writeFile(cachedFile, out.buffer);
     await fs.writeFile(`${cachedFile}.json`, JSON.stringify({ prompt, model, size, seed, cast: scene.cast || [], at: new Date().toISOString() }, null, 2));
     generated++;
@@ -285,10 +297,12 @@ export async function pickImages({ page, project, scenes, imgDir, sheets, opts =
   const env = loadEnv();
   if (opts.mock || !arkAvailable(env)) {
     log('  未配置图像模型（.env 缺少 ARK_API_KEY），使用占位图');
-    return generateMockImages({ page, project, scenes, imgDir, reason: '未配置 ARK_API_KEY' });
+    const r = await generateMockImages({ page, project, scenes, imgDir, reason: '未配置 ARK_API_KEY' });
+    return auditImages(r, { page, project, scenes, imgDir });
   }
   log(`  图像模型：${env.ARK_IMAGE_MODEL}`);
   try {
+    // 这里每一张都在写盘时过了 saveVerified，不用再整体复核一遍
     const r = await generateArkImages({ project, scenes, imgDir, env, sheets, opts });
     log(`  ✓ ${r.stats.generated} 张新生成，${r.stats.cached} 张命中缓存`);
 
@@ -297,8 +311,12 @@ export async function pickImages({ page, project, scenes, imgDir, sheets, opts =
     if (failedIds.length) {
       const missing = scenes.filter((s) => failedIds.includes(s.id));
       await generateMockImages({ page, project, scenes: missing, imgDir, reason: '这几张被模型拒绝' });
+      // 补位图也要验，不然「补了个空」比没补更糟
+      const badFill = await verifyImages(missing.map((s) => path.join(imgDir, `${s.id}.jpg`)));
+      if (badFill.length) log(`  ! 补位的占位图也坏了：${badFill.map((b) => path.basename(b.file)).join(', ')}`);
       r.stats.mode = 'partial';
       r.stats.degraded = failedIds;
+      r.stats.broken = badFill;
       log(`  ! ${failedIds.length}/${scenes.length} 张被拒，已用占位图补位：${failedIds.join(', ')}`);
       log('  ! 这条片子不是全模型画面，别当成品交付');
     }
@@ -307,14 +325,49 @@ export async function pickImages({ page, project, scenes, imgDir, sheets, opts =
     const reason = `${e.code}: ${e.message}`;
     log(`  ! ${reason}`);
     log('  → 降级为占位图；修好配额后重跑同一条命令即可，缓存不会重复花钱');
-    return generateMockImages({ page, project, scenes, imgDir, reason });
+    const r = await generateMockImages({ page, project, scenes, imgDir, reason });
+    return auditImages(r, { page, project, scenes, imgDir });
   }
 }
 
-/** 生成后再看一眼：至少确认是张能解码的图 */
+/**
+ * 占位图这条路没有「写盘时校验」，所以补一道整体体检。
+ * 坏掉的那几张重画一遍，还坏就标降级——绝不能带着一张解不开的图进渲染，
+ * 那会一路走完全部渲染，最后交出一条「质检 7/7 通过」的废片。
+ */
+async function auditImages(r, { page, project, scenes, imgDir }) {
+  const bad = await verifyImages(r.files);
+  if (!bad.length) return r;
+  const badIds = bad
+    .map((b) => path.basename(b.file).replace(/\.[^.]+$/, ''))
+    .filter((id) => scenes.some((s) => s.id === id));
+  log(`  ! ${bad.length} 张图解不开：${bad.map((b) => `${path.basename(b.file)}（${b.reason}）`).join('，')}`);
+  if (badIds.length) {
+    const retry = scenes.filter((s) => badIds.includes(s.id));
+    await generateMockImages({ page, project, scenes: retry, imgDir, reason: '重画坏掉的图' });
+    const stillBad = await verifyImages(retry.map((s) => path.join(imgDir, `${s.id}.jpg`)));
+    if (stillBad.length) log(`  ! 重画后仍然解不开：${stillBad.map((b) => path.basename(b.file)).join(', ')}`);
+    log(`  → 已重画 ${badIds.join(', ')}；这条片子算降级`);
+    r.stats.broken = stillBad;
+  }
+  r.stats.mode = 'partial';
+  r.stats.degraded = [...new Set([...(r.stats.degraded || []), ...badIds])];
+  return r;
+}
+
+/** 生成后再看一眼：这张图到底能不能解出一帧像素来 */
 export async function checkImage(file) {
   const stat = await fs.stat(file);
   if (stat.size < 8192) return { ok: false, reason: `文件过小 ${stat.size}B` };
+  // 光用 ffprobe 不够：它只解封装不看像素，一个扩展名是 .jpg 的垃圾文件
+  // 也会被它报成「有一条 mjpeg 流」。必须真的解一帧，才知道这张图能不能用。
+  const { code, stderr } = await run('ffmpeg', [
+    '-hide_banner', '-v', 'error', '-i', file, '-frames:v', '1', '-f', 'null', '-',
+  ], { allowFail: true });
+  const err = String(stderr || '').trim();
+  if (code !== 0 || err) {
+    return { ok: false, reason: err.split('\n')[0].slice(0, 90) || `解码失败（退出码 ${code}）` };
+  }
   try {
     const info = await ffprobe(file);
     const s = info.streams.find((x) => x.codec_type === 'video');
@@ -323,4 +376,38 @@ export async function checkImage(file) {
   } catch {
     return { ok: false, reason: '无法解码' };
   }
+}
+
+/**
+ * 落盘一张图，并且当场确认它能解码。
+ * 先写 .part 再改名，和分段编码同一个套路：坏图绝不能带着正确的文件名进渲染，
+ * 否则要等到成片里才发现——那时候已经花掉整条渲染的时间了。
+ */
+async function saveVerified(buffer, dst) {
+  const part = `${dst}.part`;
+  await fs.writeFile(part, buffer);
+  let chk;
+  try {
+    chk = await checkImage(part);
+  } catch (e) {
+    chk = { ok: false, reason: String(e.message || e) };
+  }
+  if (!chk.ok) {
+    await fs.rm(part, { force: true });
+    throw new ImageError(`出图不可用：${chk.reason}`, { code: 'bad-image', retryable: true });
+  }
+  await fs.rename(part, dst);
+  return chk;
+}
+
+/** 批量体检：渲染前最后一关。返回坏掉的图，空数组表示全好 */
+export async function verifyImages(files) {
+  const bad = [];
+  for (const f of files || []) {
+    if (!f) continue;
+    let chk;
+    try { chk = await checkImage(f); } catch (e) { chk = { ok: false, reason: String(e.message || e) }; }
+    if (!chk.ok) bad.push({ file: f, reason: chk.reason });
+  }
+  return bad;
 }

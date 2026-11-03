@@ -90,6 +90,22 @@ check('结果里带着「台词 + 图」清单', Array.isArray(result.shots)
   && result.shots.length === spec.scenes.length
   && result.shots.every((s) => s.narration && s.image));
 
+// 机器侧的图像门禁：每张图都要能被解码，不能只靠人眼看联系表
+const { verifyImages } = await import('../src/images.js');
+const broken = await verifyImages(result.shots.map((s) => s.image));
+check('每张图都能解码', broken.length === 0, broken.map((b) => path.basename(b.file)).join(',') || 'all ok');
+
+// 软字幕：条数和镜头数一致，且不能互相重叠（重叠会让播放器叠两层字）
+const srtText = await fs.readFile(path.join(DIR, 'out', 'smoke.srt'), 'utf8');
+const cues = srtText.trim().split(/\n\n+/).filter(Boolean).map((b) => {
+  const m = /(\d\d:\d\d:\d\d,\d\d\d) --> (\d\d:\d\d:\d\d,\d\d\d)/.exec(b);
+  const toSec = (t) => t.split(/[:,]/).reduce((acc, x, i) => acc + Number(x) * [3600, 60, 1, 0.001][i], 0);
+  return m ? { a: toSec(m[1]), b: toSec(m[2]) } : null;
+}).filter(Boolean);
+const overlap = cues.some((c, i) => i && c.a < cues[i - 1].b - 0.001);
+check('软字幕已导出且不重叠', cues.length === spec.scenes.length && !overlap,
+  `${cues.length} 条${overlap ? '（有重叠）' : ''}`);
+
 // 引擎记录：重渲要按它走，不能凭空变
 check('配音引擎已记录', !!project.voice.engineUsed, project.voice.engineUsed);
 

@@ -101,6 +101,23 @@ export function buildStoryboard(spec, opts = {}) {
   ]));
   const timeline = buildTimeline(project, durations);
 
+  // 节奏参数写歪了不会崩，只会让某一镜在时间轴上被挤掉，成片里悄无声息地少一镜
+  for (const s of project.scenes) {
+    if (s.leadIn != null && s.leadIn < 0) warnings.push(`${s.id} 的 leadIn 是负数（${s.leadIn}）：画面会晚于语音出现`);
+    if (s.tail != null && s.tail < 0) warnings.push(`${s.id} 的 tail 是负数（${s.tail}）：画面会提前切走`);
+    if (s.pauseBefore != null && s.pauseBefore < 0) warnings.push(`${s.id} 的 pauseBefore 是负数（${s.pauseBefore}）：两镜会硬叠在一起`);
+    if (s.voice?.preset && !VOICE_PRESETS[s.voice.preset]) {
+      warnings.push(`${s.id} 的 voice.preset 不认识：${s.voice.preset}（镜头级 preset 只认内置那七个）`);
+    }
+  }
+  for (const a of timeline.adjusted) {
+    warnings.push(`${a.id} 的时间轴已被自动截短：${a.why}。不会崩，但这不是你写的意思，改 spec 更好`);
+  }
+  const spineless = timeline.ranges.filter((r) => r.toFrame - r.fromFrame < 1);
+  if (spineless.length) {
+    problems.push(`有 ${spineless.length} 镜在时间轴上没有帧（${spineless.map((r) => r.id).join(', ')}），成片里会直接少掉`);
+  }
+
   const rows = project.scenes.map((s, i) => {
     const shot = shotFor(s, i);
     const cast = (s.cast || []).map((id) => project.characters.find((c) => c.id === id)?.name || id);

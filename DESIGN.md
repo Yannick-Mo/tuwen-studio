@@ -149,7 +149,7 @@ P0 实测：26.33 秒 / 790 帧 / 4 进程并行 51 秒渲完 / 23.7MB / -14.4 L
     "sfx": [{ "at": 3.2, "src": "sfx/boom.mp3", "gain": -8 }]
   }],
 
-  "deliver": { "burnSubtitles": true, "cover": true, "srt": true, "aigcLabel": true }
+  "deliver": { "burnSubtitles": true, "cover": true, "srt": true, "crf": 20 }
 }
 ```
 
@@ -183,7 +183,7 @@ __seek(t)               // 纯函数：把 t 时刻所有图层的 transform/opa
 
 ```
 每段 scene → 循环 seek(t) → page.screenshot(jpeg q92) → 管道喂 ffmpeg
-           → libx264 -crf 18 -pix_fmt yuv420p 段文件
+           → libx264 -crf 20（deliver.crf 可调）-pix_fmt yuv420p 段文件
 所有段    → concat → 混音（人声+BGM+SFX）→ loudnorm → faststart mp4
 ```
 

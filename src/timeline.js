@@ -13,8 +13,11 @@ const OUTRO = 0.65;
 export function buildTimeline(project, voiceDurations) {
   const fps = project.meta.fps;
   const q = (sec) => Math.round(sec * fps) / fps;
+  const minSpan = 1 / fps;
+  const adjusted = [];
 
   let cursor = 0;
+  let prevStart = -Infinity;
   const scenes = project.scenes.map((s, i) => {
     const voiceDur = voiceDurations.get(s.id) ?? 3;
     const pause = s.pauseBefore ?? (i === 0 ? PAUSE_FIRST : PAUSE);
@@ -23,8 +26,21 @@ export function buildTimeline(project, voiceDurations) {
 
     const voiceStart = q(cursor + pause);
     const voiceEnd = q(voiceStart + voiceDur);
-    const start = q(Math.max(0, voiceStart - lead));
-    const end = q(voiceEnd + tail);
+    let start = q(Math.max(0, voiceStart - lead));
+    let end = q(voiceEnd + tail);
+
+    // 上一镜的 leadIn 比「这一镜之前的全部内容」还长时，这一镜会倒着开始：
+    // 帧区间变成 0 或负宽度，它会被整段丢掉，成片里直接少一镜而且不报错。
+    // 宁可把提前量截短，也不让时间轴倒退。
+    if (start < prevStart + minSpan) {
+      start = q(prevStart + minSpan);
+      adjusted.push({ id: s.id, why: 'leadIn 太长，上一镜还没开始就要求入场' });
+    }
+    if (end <= start) {
+      end = q(start + minSpan);
+      adjusted.push({ id: s.id, why: 'pauseBefore 太短，语音落在画面之前' });
+    }
+    prevStart = start;
 
     cursor = end;
 
@@ -58,6 +74,7 @@ export function buildTimeline(project, voiceDurations) {
     totalDuration: totalFrames / fps,
     scenes,
     ranges,
+    adjusted,
   };
 }
 
