@@ -5,7 +5,7 @@
  */
 import path from 'node:path';
 import { buildProject } from './demo.js';
-import { normalizeProject, VOICE_PRESETS } from './schema.js';
+import { normalizeProject, VOICE_PRESETS, PLATFORM_SAFE } from './schema.js';
 import { buildPrompt, shotFor } from './images.js';
 import { buildTimeline } from './timeline.js';
 import { synthesizeAll } from './tts.js';
@@ -76,6 +76,10 @@ export function buildStoryboard(spec, opts = {}) {
   const engine = project.voice?.engine;
   if (engine && !['edge', 'volc'].includes(engine)) {
     problems.push(`voice.engine 只能是 edge 或 volc，收到：${engine}`);
+  }
+  // 平台名写错会静默退回抖音的安全区，字幕就可能被 UI 挡
+  if (!PLATFORM_SAFE[project.meta.platform]) {
+    warnings.push(`platform 不认识：${project.meta.platform}，字幕安全区会退回抖音的 17.2%（可选：${Object.keys(PLATFORM_SAFE).join(' / ')}）`);
   }
   if (engine === 'volc' && !project.voice?.reference) {
     warnings.push('volc 没有指定 voice.reference：音色锚点会取当次第一句，换条片子嗓子会变');
