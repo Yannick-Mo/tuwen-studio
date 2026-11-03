@@ -5,11 +5,11 @@
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { sha1, ensureDir, exists, log, loadEnv, ffprobe, run } from './util.js';
+import { sha1, ensureDir, exists, log, loadEnv, ffprobe, run, CACHE_ROOT, ffmpegBin } from './util.js';
 import { generateArk, arkAvailable, ImageError } from './providers/ark.js';
 import { ASPECTS } from './schema.js';
 
-const CACHE_DIR = path.resolve('.cache/img');
+const CACHE_DIR = path.join(CACHE_ROOT, 'img');
 
 /** 各画幅的合法出图尺寸（Seedream 要求 ≥3686400 像素） */
 const ARK_SIZE_BY_ASPECT = {
@@ -361,7 +361,7 @@ export async function checkImage(file) {
   if (stat.size < 8192) return { ok: false, reason: `文件过小 ${stat.size}B` };
   // 光用 ffprobe 不够：它只解封装不看像素，一个扩展名是 .jpg 的垃圾文件
   // 也会被它报成「有一条 mjpeg 流」。必须真的解一帧，才知道这张图能不能用。
-  const { code, stderr } = await run('ffmpeg', [
+  const { code, stderr } = await run(ffmpegBin(), [
     '-hide_banner', '-v', 'error', '-i', file, '-frames:v', '1', '-f', 'null', '-',
   ], { allowFail: true });
   const err = String(stderr || '').trim();

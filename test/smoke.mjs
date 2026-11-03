@@ -9,12 +9,14 @@
  */
 import { spawn } from 'node:child_process';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
+import { ROOT, PROJECTS_DIR } from '../src/util.js';
 
 const REAL = process.argv.includes('--real');
-const SPEC = path.resolve('test/fixtures/smoke.json');
+const SPEC = path.join(ROOT, 'test', 'fixtures', 'smoke.json');
 const ID = 'smoke';
-const DIR = path.resolve('projects', ID);
+const DIR = path.join(PROJECTS_DIR, ID);
 
 const results = [];
 function check(name, ok, detail = '') {
@@ -24,7 +26,8 @@ function check(name, ok, detail = '') {
 
 function runNode(args) {
   return new Promise((resolve) => {
-    const child = spawn(process.execPath, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    // 故意在临时目录里跑：引擎的所有路径都必须从文件位置算，不能依赖当前工作目录
+    const child = spawn(process.execPath, args, { stdio: ['ignore', 'pipe', 'pipe'], cwd: os.tmpdir() });
     let out = '';
     let err = '';
     child.stdout.on('data', (d) => { out += d; });
@@ -39,7 +42,7 @@ console.log(`▸ 冒烟测试 ${REAL ? '（真实出图）' : '（占位图，�
 // 从干净状态起跑，否则旧产物会让测试永远通过
 await fs.rm(DIR, { recursive: true, force: true });
 
-const args = ['src/cli.js', 'build', SPEC, '--yes'];
+const args = [path.join(ROOT, 'src', 'cli.js'), 'build', SPEC, '--yes'];
 if (!REAL) args.push('--mock');
 const r = await runNode(args);
 
@@ -117,6 +120,32 @@ if (REAL) {
   check('占位图模式被正确标记为降级', result.images.mode === 'mock' && result.degraded === true);
   check('降级时 result.ok 为 false', result.ok === false, '质检过但不算成品');
 }
+
+// 自检命令本身要能跑通：换台机器第一个该跑的就是它
+const doctorJson = await new Promise((resolve) => {
+  const child = spawn(process.execPath, [path.join(ROOT, 'src', 'cli.js'), 'doctor', '--json'], { cwd: os.tmpdir() });
+  let out = '';
+  child.stdout.on('data', (d) => { out += d; });
+  child.on('close', () => resolve(out.trim().split('\n').pop() || ''));
+});
+let doctorOk = false;
+try {
+  const j = JSON.parse(doctorJson);
+  doctorOk = Array.isArray(j.checks)
+    && j.checks.some((c) => c.name === 'ffmpeg' && c.ok)
+    && typeof j.paths?.projects === 'string';
+} catch { doctorOk = false; }
+check('doctor 能给出机器可读的自检结果', doctorOk);
+
+// 插件得能在「引擎被当成包安装」的情况下找到引擎（不能靠硬编码路径）
+check('插件能解析到引擎目录', await (async () => {
+  try {
+    const { apply } = await import('../plugin-video-studio/index.js');
+    const tools = [];
+    apply({ effect: (f) => f(), tools: { register: (t) => tools.push(t) } }, { engineDir: ROOT });
+    return tools.length === 6;
+  } catch { return false; }
+})(), '6 个工具');
 
 const pass = results.filter((c) => c.ok).length;
 const fail = results.length - pass;

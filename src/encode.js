@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { decodePcm, wavFromPcm, ffmpeg, ensureDir, log, clamp, run } from './util.js';
+import { decodePcm, wavFromPcm, ffmpeg, ensureDir, log, clamp, run, ffmpegBin } from './util.js';
 import { seek, shot } from './stage.js';
 
 const RATE = 48000;
@@ -26,7 +26,7 @@ async function encodeSegment(page, fromFrame, count, fps, file, onFrame, { crf =
     '-pix_fmt', 'yuv420p', '-r', String(fps), '-g', String(fps * 2),
     '-an', '-f', 'mp4', part,
   ];
-  const child = spawn('ffmpeg', args, { stdio: ['pipe', 'ignore', 'pipe'] });
+  const child = spawn(ffmpegBin(), args, { stdio: ['pipe', 'ignore', 'pipe'] });
   let stderr = '';
   child.stderr.on('data', (d) => { stderr += d.toString(); });
   const done = new Promise((resolve, reject) => {
@@ -208,7 +208,7 @@ async function loudnormFilter(inputArgs, chain, loudness) {
   const measure = `loudnorm=I=${loudness}:TP=-1.5:LRA=11:print_format=json`;
   let measured = null;
   try {
-    const { stderr } = await run('ffmpeg', [
+    const { stderr } = await run(ffmpegBin(), [
       '-hide_banner', '-nostats', ...inputArgs,
       '-filter_complex', `${chain}${measure}[a]`, '-map', '[a]', '-f', 'null', '-',
     ], { allowFail: true });

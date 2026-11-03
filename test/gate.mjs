@@ -10,10 +10,11 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { apply } from '../plugin-video-studio/index.js';
+import { ROOT, PROJECTS_DIR, CACHE_ROOT } from '../src/util.js';
 
 const ID = 'gate-test';
-const DIR = path.resolve('projects', ID);
-const SEEN = path.resolve('.cache', 'storyboard-seen.json');
+const DIR = path.join(PROJECTS_DIR, ID);
+const SEEN = path.join(CACHE_ROOT, 'storyboard-seen.json');
 
 const results = [];
 function check(name, ok, detail = '') {
@@ -24,7 +25,7 @@ const exists = (p) => fs.stat(p).then(() => true).catch(() => false);
 
 // 注册工具（effect 直接执行，register 收进数组）
 const tools = [];
-apply({ effect: (f) => f(), tools: { register: (t) => tools.push(t) } }, { engineDir: path.resolve('.') });
+apply({ effect: (f) => f(), tools: { register: (t) => tools.push(t) } }, { engineDir: ROOT });
 const build = tools.find((t) => t.name === 'video_studio_build');
 if (!build) throw new Error('没注册出 video_studio_build');
 

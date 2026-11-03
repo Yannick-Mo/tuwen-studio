@@ -6,14 +6,15 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { ensureDir, exists, ffprobe, run, sha1, log } from './util.js';
+import { ensureDir, exists, ffprobe, run, sha1, log, CACHE_ROOT, ROOT } from './util.js';
 import { VOICE_PRESETS } from './schema.js';
+import { synthesizeEdge } from './providers/edge-js.js';
 
-const CACHE_DIR = path.resolve('.cache/tts');
-const BLOCK_FILE = path.resolve('.cache/edge-blocked.json');
+const CACHE_DIR = path.join(CACHE_ROOT, 'tts');
+const BLOCK_FILE = path.join(CACHE_ROOT, 'edge-blocked.json');
 const BLOCK_MINUTES = 15;
 // 跨项目共用的 volc 音色锚点：没有它，每换一条片子就换一把嗓子
-const DEFAULT_ANCHOR = path.resolve('assets/volc-anchor.mp3');
+const DEFAULT_ANCHOR = path.join(ROOT, 'assets', 'volc-anchor.mp3');
 
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
@@ -229,19 +230,34 @@ export class VoiceEngine {
       const mp3 = path.join(outDir, `${id}.mp3`);
       const srt = path.join(outDir, `${id}.srt`);
       const delays = [700, 1600, 3200, 5500];
+      let lastErr = null;
       for (let i = 0; i < delays.length; i++) {
+        // ① 纯 Node 实现：不需要 Python，也不需要装 edge-tts
+        try {
+          const r = await synthesizeEdge({
+            text: scene.narration, voice: v.name, rate: v.rate, pitch: v.pitch, outFile: mp3,
+          });
+          const dur = await probeDuration(mp3);
+          if (!(dur > 0.15)) throw new Error(`音频过短 ${dur}s`);
+          this.edgeDead = 0;
+          this.stats.edge++;
+          return { file: mp3, duration: dur, words: r.words, engine: 'edge', impl: 'node', voice: v.name };
+        } catch (e) {
+          lastErr = e;
+        }
+        // ② 老路径：机器上装了 Python 版 edge-tts 的话，多一层兜底
         try {
           const r = await tryEdgeOnce({ text: scene.narration, voice: v.name, rate: v.rate, pitch: v.pitch, mp3, srt });
           if (r) {
             this.edgeDead = 0;
             this.stats.edge++;
-            return { file: mp3, duration: r.duration, words: r.words, engine: 'edge', voice: v.name };
+            return { file: mp3, duration: r.duration, words: r.words, engine: 'edge', impl: 'cli', voice: v.name };
           }
-        } catch { /* retry */ }
+        } catch { /* 两条路都不通才退避重试 */ }
         await sleep(delays[i] + Math.random() * 300);
       }
       this.edgeDead++;
-      log(`  ! edge-tts 不可用（${this.edgeDead}），改用本地引擎`);
+      log(`  ! edge 配音不可用（连续 ${this.edgeDead} 句）：${String(lastErr?.message || '').slice(0, 80)}`);
       if (this.edgeDead >= 2) await markEdgeBlocked();
     }
 

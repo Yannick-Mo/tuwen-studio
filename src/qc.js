@@ -1,6 +1,6 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
-import { ffprobe, ffmpeg, run } from './util.js';
+import { ffprobe, ffmpeg, run, ffmpegBin } from './util.js';
 
 /** 自动质检：黑帧、冻帧、响度、削波、时长、码率。不过就不交付。 */
 export async function qcReport(file, expect = {}) {
@@ -10,7 +10,7 @@ export async function qcReport(file, expect = {}) {
   const duration = Number(info.format.duration || 0);
   const checks = [];
 
-  const { stderr } = await run('ffmpeg', [
+  const { stderr } = await run(ffmpegBin(), [
     '-hide_banner', '-nostats', '-i', file,
     '-vf', 'blackdetect=d=0.3:pix_th=0.12,freezedetect=n=0.003:d=1.5',
     '-af', 'ebur128=peak=true',

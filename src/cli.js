@@ -15,7 +15,7 @@ import { pickImages, generateOne, ensureCharacterSheets } from './images.js';
 import { qcReport, contactSheet, imageSheet } from './qc.js';
 import { makeCover, pickCoverScene } from './cover.js';
 import { buildSrt } from './subtitles.js';
-import { ensureDir, exists, loadEnv, decodePcm, log, writeJson, sha1 } from './util.js';
+import { ensureDir, exists, loadEnv, decodePcm, log, writeJson, sha1, PROJECTS_DIR, CACHE_ROOT } from './util.js';
 import { DEMO, buildProject, withSubjects } from './demo.js';
 import { buildStoryboard, formatStoryboard, measureVoices } from './plan.js';
 
@@ -141,7 +141,7 @@ async function renderFingerprint(project, stageProject, imgDir) {
 }
 
 async function runDemo(demo, opts = {}) {
-  const dir = path.resolve('projects', demo.id);
+  const dir = path.join(PROJECTS_DIR, demo.id);
   const imgDir = path.join(dir, 'img');
   const voiceDir = path.join(dir, 'voice');
   const workDir = path.join(dir, 'work');
@@ -530,7 +530,7 @@ const SFX_RULES = {
 };
 
 async function buildSfxPlacements(project, timeline) {
-  const lib = await ensureSfx(path.resolve('.cache/sfx'));
+  const lib = await ensureSfx(path.join(CACHE_ROOT, 'sfx'));
   const decoded = new Map();
   const placements = [];
   for (let i = 0; i < timeline.scenes.length - 1; i++) {
@@ -567,7 +567,7 @@ async function framesFor(projectFile, times) {
 }
 
 async function listProjects() {
-  const root = path.resolve('projects');
+  const root = PROJECTS_DIR;
   const rows = [];
   const dirs = await fs.readdir(root).catch(() => []);
   for (const d of dirs) {
@@ -609,7 +609,7 @@ try {
     // 默认真跑一遍配音量时长（本地、免费、有缓存）；--fast 跳过，退回字数估算
     const voices = args.fast ? null : await measureVoices(spec, { fallback: !!args.fallback, engine: args.engine });
     const sb = buildStoryboard(spec, { voices });
-    const dir = path.resolve('projects', spec.id);
+    const dir = path.join(PROJECTS_DIR, spec.id);
     await ensureDir(dir);
     await writeJson(path.join(dir, 'storyboard.json'), sb);
     await fs.writeFile(path.join(dir, 'storyboard.md'), `${formatStoryboard(sb)}\n`, 'utf8');
@@ -624,7 +624,7 @@ try {
     // 先出分镜表：这一步不花钱
     const voices = args.fast ? null : await measureVoices(spec, { fallback: !!args.fallback, engine: args.engine });
     const sb = buildStoryboard(spec, { voices });
-    const dir = path.resolve('projects', spec.id);
+    const dir = path.join(PROJECTS_DIR, spec.id);
     await ensureDir(dir);
     await writeJson(path.join(dir, 'storyboard.json'), sb);
     await fs.writeFile(path.join(dir, 'storyboard.md'), `${formatStoryboard(sb)}\n`, 'utf8');
@@ -671,6 +671,36 @@ try {
     const s = await startStudio({ port: args.port ? Number(args.port) : 7788 });
     console.log(`\n▸ 工作台已启动：${s.url}`);
     console.log('  浏览器打开它，就能点分镜、看成片、改提示词、只重渲一镜。Ctrl+C 结束。');
+  } else if (cmd === 'setup') {
+    const { startStudio } = await import('./studio.js');
+    const port = args.port ? Number(args.port) : 7788;
+    const s = await startStudio({ port });
+    const url = `${s.url.replace(/\/$/, '')}/setup`;
+    console.log(`\n▸ 配置页：${url}`);
+    console.log('  在浏览器里填 API Key，直接写进本机配置，不经过对话、也不会上传。');
+    console.log('  填完回终端跑一次 `tuwen doctor` 复查。Ctrl+C 结束。');
+    if (!args['no-open']) {
+      const { spawn } = await import('node:child_process');
+      const open = process.platform === 'win32' ? ['cmd', ['/c', 'start', '', url]]
+        : process.platform === 'darwin' ? ['open', [url]] : ['xdg-open', [url]];
+      try { spawn(open[0], open[1], { windowsHide: true, stdio: 'ignore' }).unref(); } catch { /* 打不开就手动点链接 */ }
+    }
+  } else if (cmd === 'doctor' || cmd === 'config') {
+    const mod = await import('./doctor.js');
+    if (cmd === 'config') {
+      const { readConfig } = await import('./config.js');
+      if (args.json) {
+        const cfg = readConfig();
+        console.log(JSON.stringify({
+          file: cfg.file, exists: cfg.exists,
+          rows: cfg.rows.map(({ key, group, label, set, source, masked }) => ({ key, group, label, set, source, masked })),
+        }));
+      } else console.log(mod.formatConfig());
+    } else {
+      const r = await mod.runDoctor({ network: !!args.network });
+      console.log(args.json ? JSON.stringify(r) : mod.formatDoctor(r));
+      if (!r.ok) process.exitCode = 1;
+    }
   } else if (cmd === 'list') {
     console.log(JSON.stringify(await listProjects()));
   } else if (cmd === 'render') {
@@ -686,6 +716,9 @@ try {
   node src/cli.js render <project.json>   只重渲已有项目（图/音已就绪）
   node src/cli.js frames <p.json> --times=1,3.5   取静帧审片
   node src/cli.js restore <p.json> --to=1  回到上一个成片版本（回退也能反悔）
+  node src/cli.js doctor                  自检：缺什么、怎么装（--network 顺便连一次网）
+  node src/cli.js config                  看当前配置生效的来源（key 一律打码）
+  node src/cli.js setup                   开配置页，在浏览器里填 API Key（不经过对话）
   node src/cli.js studio                  打开本地工作台（分镜 / 预览 / 单镜重渲）
   node src/cli.js list                    列出项目
 

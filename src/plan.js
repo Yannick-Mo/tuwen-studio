@@ -11,6 +11,7 @@ import { buildTimeline } from './timeline.js';
 import { synthesizeAll } from './tts.js';
 import { prepareVoices } from './encode.js';
 import { DELIVERY_LABELS } from './delivery.js';
+import { PROJECTS_DIR } from './util.js';
 
 /** 中文语速约 5 字/秒，标点略停顿。只在量不到真声音时兜底。 */
 export function estimateVoiceSeconds(text) {
@@ -32,7 +33,7 @@ export function projectFromSpec(spec) {
 export async function measureVoices(spec, opts = {}) {
   try {
     const project = projectFromSpec(spec);
-    const dir = path.resolve('projects', project.id);
+    const dir = path.join(PROJECTS_DIR, project.id);
     const { voices } = await synthesizeAll(project, path.join(dir, 'voice'), {
       fallback: opts.fallback, quiet: true, engine: opts.engine,
     });

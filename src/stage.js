@@ -2,11 +2,9 @@ import path from 'node:path';
 import fs from 'node:fs';
 import http from 'node:http';
 import { chromium } from 'playwright';
-
-const ROOT = path.resolve('.');
+import { ROOT, PROJECTS_DIR } from './util.js';
 // 渲染页只需要两样东西：舞台本身和项目素材。
 // 以前是整个仓库都对外服务，`GET /.env` 就能把 API Key 读走——本地端口也是端口。
-const ALLOW = ['/stage/', '/projects/'];
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -17,13 +15,25 @@ const MIME = {
   '.json': 'application/json',
 };
 
-/** 还原成绝对路径，并判断它是否落在允许的目录里 */
+/**
+ * 把 url 还原成绝对路径，并判断它是否落在允许的目录里。
+ * /projects/* 落在项目目录（可能被 TUWEN_PROJECTS 挪到别处），/stage/* 落在舞台目录。
+ */
 function resolveAllowed(url) {
-  const file = path.resolve(ROOT, `.${url}`);
-  const rel = path.relative(ROOT, file);
+  let base = null;
+  let rest = '';
+  if (url.startsWith('/projects/')) {
+    base = PROJECTS_DIR;
+    rest = url.slice('/projects'.length);
+  } else if (url.startsWith('/stage/')) {
+    base = path.join(ROOT, 'stage');
+    rest = url.slice('/stage'.length);
+  }
+  if (!base) return null;
+  const file = path.resolve(base, `.${rest}`);
+  const rel = path.relative(base, file);
   if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) return null;
-  const asUrl = `/${rel.replace(/\\/g, '/')}`;
-  return ALLOW.some((p) => asUrl.startsWith(p)) ? file : null;
+  return file;
 }
 
 function startServer() {

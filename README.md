@@ -7,6 +7,44 @@
 
 ---
 
+## 安装
+
+三种依赖三种命：**Node 要自己装，其他跟着 npm 走，API Key 在浏览器里填。**
+
+```powershell
+# 1. Node >= 20.11（import.meta.dirname 从 20.11 开始有）
+node -v
+
+# 2. 把仓库放到任意目录（clone 或解压都行），装依赖
+#    ffmpeg / ffprobe / Chromium / 配音引擎会一起装好，不用另外配 PATH
+npm install
+
+# 3. 自检：缺什么、怎么装，逐条告诉你（--network 顺便真连一次网）
+node src/cli.js doctor
+
+# 4. 配 API Key：打开本机页面，自己在浏览器里填
+#    写进 ~/.dsh/tuwen/.env，不经过对话、不进日志、不上传
+node src/cli.js setup
+
+# 5. 出第一条片（没有 Key 也能跑，先用占位图，不花钱）
+node src/cli.js demo
+```
+
+装完之后可以把 `node src/cli.js` 换成 `tuwen`（`npm link` 或全局安装后）。
+
+| 依赖 | 谁负责 | 缺了会怎样 |
+|---|---|---|
+| Node ≥ 20.11 | 你自己装 | 直接跑不起来 |
+| ffmpeg / ffprobe | `npm install`（ffmpeg-static / ffprobe-static 自带二进制） | 自检会说清楚；也可用 `FFMPEG_PATH` 指自己的 |
+| Chromium | `npm install` 的 postinstall 自动下（约 150MB，只下一次） | `npx playwright install chromium` |
+| 配音引擎 | `npm install`（msedge-tts，纯 Node） | 不需要 Python，也不用 `pip install` |
+| API Key | `tuwen setup` 页面里填 | 不填也能出片，但画面是占位图，不算成品 |
+
+**发给别人时**：`npm pack` 会打出一个约 120KB 的 tgz，除依赖外什么都带齐（`docs/`、`specs/`、`test/`）。
+对方 `npm i <tgz>` 之后跑 `tuwen doctor` 就够了。插件单独装：`node scripts/install-plugin.mjs`。
+
+---
+
 ## 30 秒上手
 
 ```powershell
@@ -19,7 +57,8 @@ node src/cli.js demo
 |---|---|
 | `blackhole.mp4` | 成片（1080×1920 / 30fps / H.264 + AAC） |
 | `qc.json` | 自动质检报告 |
-| `cover.jpg` | 封面帧 |
+| `cover.jpg` | 封面 |
+| `blackhole.srt` | 软字幕（和画面上那份同一套时间轴） |
 | `contact-sheet.jpg` | 成片联系表（每 2 秒一帧） |
 | `images-sheet.jpg` | 原图联系表（每镜一张，出图后就生成，用来查图对没对上台词） |
 
@@ -29,19 +68,27 @@ node src/cli.js demo
 
 ## 在对话里用（DSH 插件）
 
-插件 `@local/dsh-video-studio` 已装进当前 profile（是 Junction，指向本仓库，改了立刻生效）。五个工具：
+插件 `@local/dsh-video-studio` 是引擎的遥控器，六个工具：
 
 | 工具 | 干什么 |
 |---|---|
 | `video_studio_guide` | **先调这个**：完整使用手册，选型/分镜写法/交付检查/常见坑 |
 | `video_studio_build` | 给一份剧本描述（JSON），先出分镜表，确认后出 mp4 |
+| `video_studio_review` | 把每一镜的台词、原图、配音并排摊开，供逐张验图 |
 | `video_studio_scene` | 只改一镜，25 秒 |
 | `video_studio_frames` | 从已渲染项目里取静帧审片（每帧 0.1 秒） |
 | `video_studio_list` | 列出本机项目 |
 
+装进 DSH（在 profile 的 `node_modules` 里建链接，改了代码重开会话就生效）：
+
+```powershell
+node scripts/install-plugin.mjs --list     # 看有哪些 profile、装没装
+node scripts/install-plugin.mjs --profile web
+```
+
 说一句「用图文视频工坊做一条关于银河系的竖屏视频，三镜」就能跑。
 
-**手册是给 agent 看的**：[docs/PLAYBOOK.md](docs/PLAYBOOK.md)。新会话没有历史上下文，`video_studio_guide` 返回的就是这份文件——风格怎么选、台词多长、哪五个坑已经踩过，都写在里面。改手册不用改代码。
+**手册是给 agent 看的**：[docs/PLAYBOOK.md](docs/PLAYBOOK.md)。新会话没有历史上下文，`video_studio_guide` 返回的就是这份文件——风格怎么选、台词多长、哪几个坑已经踩过，都写在里面。改手册不用改代码。
 
 ---
 
@@ -145,10 +192,14 @@ node src/cli.js build specs/chapter-02.json --yes   # 真正出图 + 渲染
 
 ```powershell
 node src/cli.js demo                      # 内置示例
+node src/cli.js doctor                    # 自检：缺什么、怎么装（--network 顺便连一次网）
+node src/cli.js setup                     # 开配置页填 API Key（不经过对话）
+node src/cli.js config                    # 看配置生效来源（key 一律打码）
 node src/cli.js build spec.json --json    # 按剧本描述出片（配图/配音/渲染全自动）
 node src/cli.js scene p.json --id=s3      # 只改一镜（重出图 + 只重渲这一段，约 25 秒）
 node src/cli.js render project.json       # 只重渲（图和音已就绪）
 node src/cli.js frames p.json --times=1,3.5   # 取静帧审片
+node src/cli.js restore p.json --to=1     # 回到上一个成片版本
 node src/cli.js list                      # 列出项目
 ```
 
@@ -289,7 +340,7 @@ ARK_IMAGE_SIZE=1440x2560
 
 volc 的音色靠**参考音频锚定**——不锚定的话，同一句提示词两次调用能差 26 Hz（听感上就是换了个人）。默认自动取第一句当锚点，也可以用 `voice.reference` 指定一段固定样本，跨片一致。
 
-edge 内部还有三级兜底：**edge-tts**（音质最好、带词级时间戳，会间歇性 403，自动重试 + 熔断）→ **Piper**（离线、快）→ **Windows SAPI**（永远能出声）。
+edge 是**纯 Node 实现**（`msedge-tts`），不需要 Python、不需要 `pip install`，而且带词级时间戳（卡拉 OK 字幕靠它）。内部还有三级兜底：**Node 实现** → **Python 版 edge-tts**（机器上装过的话自动兜一下）→ **Piper**（离线、快）→ **Windows SAPI**（永远能出声）。连续两句失败会熔断 15 分钟，不会每句都卡在那儿等。
 
 命中缓存的结果不会重复合成，缓存键包含引擎和表演提示，所以换引擎不会串。
 

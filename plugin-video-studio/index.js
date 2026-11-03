@@ -1,21 +1,58 @@
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 
 export const name = 'video-studio';
 export const inject = ['tools'];
 
-const DEFAULT_ENGINE = 'D:\\YannickFile\\TuWenShiPin';
+const requireFromPlugin = createRequire(import.meta.url);
 
-/** 从插件自身位置推断引擎目录（本地链接安装时正好是上一级） */
+/** 一个目录像不像引擎：得有入口和清单，光有名字不算 */
+function looksLikeEngine(dir) {
+  try {
+    return Boolean(dir)
+      && existsSync(path.join(dir, 'src', 'cli.js'))
+      && existsSync(path.join(dir, 'package.json'));
+  } catch { return false; }
+}
+
+/** 引擎当成 npm 包装着的时候，从 node_modules 里把它找出来 */
+function engineFromNodeModules() {
+  for (const id of ['tuwen-studio/src/cli.js', 'tuwen-studio']) {
+    try {
+      return path.resolve(path.dirname(requireFromPlugin.resolve(id)), '..');
+    } catch { /* 没装成包，正常 */ }
+  }
+  return null;
+}
+
+/**
+ * 从插件自身位置推断引擎目录。
+ * 以前是「第一个候选直接 return」，换台机器装错位置就会报一句看不懂的
+ * 「找不到 cli.js」。现在逐个验证，全都不像引擎时把试过的路径列出来。
+ */
 function resolveEngine(config) {
   const candidates = [
     config.engineDir,
+    process.env.TUWEN_ENGINE,
+    engineFromNodeModules(),
+    // 仓库模式：插件就住在引擎里，上一级就是引擎根
     path.resolve(import.meta.dirname, '..'),
-    DEFAULT_ENGINE,
   ].filter(Boolean);
-  return candidates[0];
+
+  const tried = [];
+  for (const c of candidates) {
+    if (looksLikeEngine(c)) return c;
+    tried.push(c);
+  }
+  throw new Error([
+    '找不到 tuwen 引擎目录（需要包含 src/cli.js 和 package.json）。试过：',
+    ...tried.map((p) => `  - ${p}`),
+    '指定方式：设环境变量 TUWEN_ENGINE=<引擎目录>，或在插件配置里给 engineDir。',
+  ].join('\n'));
 }
 
 // 「这个 spec 的分镜表给人看过没有」的记账本。
@@ -58,13 +95,14 @@ function killTree(child) {
   }
 }
 
-function runCli(engineDir, args, { timeoutMs }) {
+function runCli(engineDir, args, { timeoutMs, projectsDir }) {
   const cli = path.join(engineDir, 'src', 'cli.js');
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [cli, ...args], {
       cwd: engineDir,
       windowsHide: true,
-      env: { ...process.env, FORCE_COLOR: '0' },
+      // 把项目目录显式传下去：插件按这个路径写 spec，引擎必须按同一个路径读
+      env: { ...process.env, FORCE_COLOR: '0', ...(projectsDir ? { TUWEN_PROJECTS: projectsDir } : {}) },
     });
     let out = '';
     let err = '';
@@ -105,6 +143,10 @@ const OUT_SCHEMA = {
 
 export function apply(ctx, config = {}) {
   const engineDir = resolveEngine(config);
+  // 项目目录：跟着环境变量走，和引擎里的 PROJECTS_DIR 用同一条规则
+  const projectsDir = process.env.TUWEN_PROJECTS
+    ? path.resolve(process.env.TUWEN_PROJECTS)
+    : path.join(engineDir, 'projects');
   const jobs = Number(config.jobs) || 4;
   const timeoutMs = Number(config.timeoutMs) || 20 * 60 * 1000;
 
@@ -262,7 +304,7 @@ export function apply(ctx, config = {}) {
       }
       spec.id = id;
 
-      const dir = path.join(engineDir, 'projects', id);
+      const dir = path.join(projectsDir, id);
       await fs.mkdir(dir, { recursive: true });
       const specPath = path.join(dir, 'spec.json');
       if (hasSpec) {
@@ -280,7 +322,7 @@ export function apply(ctx, config = {}) {
 
       if (!args.confirmed || !alreadyShown) {
         try {
-          const { out } = await runCli(engineDir, ['plan', specPath, '--json'], { timeoutMs: 180_000 });
+          const { out } = await runCli(engineDir, ['plan', specPath, '--json'], { timeoutMs: 180_000, projectsDir });
           const sb = lastJson(out);
           if (!sb) return { ok: false, error: '分镜表生成失败' };
           // 记一笔：下次同一个 spec 带 confirmed 来，才放行
@@ -302,7 +344,7 @@ export function apply(ctx, config = {}) {
       }
 
       try {
-        const { out } = await runCli(engineDir, ['build', specPath, '--yes', '--json', `--jobs=${args.jobs || jobs}`], { timeoutMs });
+        const { out } = await runCli(engineDir, ['build', specPath, '--yes', '--json', `--jobs=${args.jobs || jobs}`], { timeoutMs, projectsDir });
         const result = lastJson(out);
         if (!result) throw new Error('引擎没有返回结果 JSON');
         return result;
@@ -334,7 +376,8 @@ export function apply(ctx, config = {}) {
     },
     async execute() {
       try {
-        const p = path.join(import.meta.dirname, '..', 'docs', 'PLAYBOOK.md');
+        // 手册跟着引擎走：你装的是哪个版本的引擎，就该读哪个版本的手册
+        const p = path.join(engineDir, 'docs', 'PLAYBOOK.md');
         const guide = await fs.readFile(p, 'utf8');
         return { ok: true, guide };
       } catch (e) {
@@ -380,7 +423,7 @@ export function apply(ctx, config = {}) {
       const id = String(args.projectId || '').trim();
       if (!id) throw new Error('要指定 projectId');
       try {
-        const dir = path.join(engineDir, 'projects', id);
+        const dir = path.join(projectsDir, id);
         const project = JSON.parse(await fs.readFile(path.join(dir, 'project.json'), 'utf8'));
         const shots = [];
         for (const [i, s] of (project.scenes || []).entries()) {
@@ -462,12 +505,12 @@ export function apply(ctx, config = {}) {
       const sceneId = String(args.sceneId || '').trim();
       if (!/^[a-z0-9][a-z0-9_-]{0,40}$/.test(id)) throw new Error('非法 projectId');
       if (!/^[A-Za-z0-9_-]{1,20}$/.test(sceneId)) throw new Error('非法 sceneId');
-      const cli = ['scene', path.join(engineDir, 'projects', id, 'project.json'), `--id=${sceneId}`];
+      const cli = ['scene', path.join(projectsDir, id, 'project.json'), `--id=${sceneId}`];
       if (args.prompt) cli.push(`--prompt=${args.prompt}`);
       if (args.seed != null) cli.push(`--seed=${args.seed}`);
       if (args.noImage) cli.push('--no-image');
       try {
-        const { out } = await runCli(engineDir, cli, { timeoutMs: 10 * 60 * 1000 });
+        const { out } = await runCli(engineDir, cli, { timeoutMs: 10 * 60 * 1000, projectsDir });
         return lastJson(out) || { ok: false, error: '引擎没有返回结果' };
       } catch (e) {
         return { ok: false, error: String(e.message).slice(0, 1500) };
@@ -515,7 +558,7 @@ export function apply(ctx, config = {}) {
       const times = (args.times || []).filter((n) => Number.isFinite(n) && n >= 0).slice(0, 12);
       if (!times.length) throw new Error('times 不能为空');
       try {
-        const { out } = await runCli(engineDir, ['frames', path.join(engineDir, 'projects', id, 'project.json'), `--times=${times.join(',')}`], { timeoutMs: 5 * 60 * 1000 });
+        const { out } = await runCli(engineDir, ['frames', path.join(projectsDir, id, 'project.json'), `--times=${times.join(',')}`], { timeoutMs: 5 * 60 * 1000, projectsDir });
         return lastJson(out) || { ok: false, error: '没有取到帧' };
       } catch (e) {
         return { ok: false, error: String(e.message).slice(0, 1200) };
@@ -544,7 +587,7 @@ export function apply(ctx, config = {}) {
     timeoutMs: 60_000,
     isConcurrencySafe: () => true,
     async execute() {
-      const { out } = await runCli(engineDir, ['list'], { timeoutMs: 60_000 });
+      const { out } = await runCli(engineDir, ['list'], { timeoutMs: 60_000, projectsDir });
       return { projects: lastJson(out) || [] };
     },
   }));

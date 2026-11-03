@@ -1,25 +1,67 @@
 import { createHash } from 'node:crypto';
 import fs from 'node:fs/promises';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 
-/** 读 .env（不覆盖已有环境变量），没有就返回 {} */
-export function loadEnv(file = '.env') {
-  const out = { ...process.env };
+// ── 位置：一律从「这个文件在哪」算，不从「你在哪个目录」算 ──────────
+// 以前整套路径都基于 process.cwd()，导致换个目录跑 `tuwen list` 会静默返回空数组。
+export const ROOT = path.resolve(import.meta.dirname, '..');
+export const CACHE_ROOT = process.env.TUWEN_CACHE
+  ? path.resolve(process.env.TUWEN_CACHE)
+  : path.join(ROOT, '.cache');
+export const PROJECTS_DIR = process.env.TUWEN_PROJECTS
+  ? path.resolve(process.env.TUWEN_PROJECTS)
+  : path.join(ROOT, 'projects');
+export const CONFIG_DIR = process.env.TUWEN_HOME
+  ? path.resolve(process.env.TUWEN_HOME)
+  : path.join(os.homedir(), '.dsh', 'tuwen');
+export const USER_ENV_FILE = path.join(CONFIG_DIR, '.env');
+export const REPO_ENV_FILE = path.join(ROOT, '.env');
+
+const require = createRequire(import.meta.url);
+const safeRequire = (m) => { try { return require(m); } catch { return null; } };
+const maybeFile = (p) => (p && existsSync(p) ? p : null);
+
+function parseEnvFile(file) {
+  const out = {};
   try {
-    const raw = readFileSync(path.resolve(file), 'utf8');
-    for (const line of raw.split(/\r?\n/)) {
+    for (const line of readFileSync(file, 'utf8').split(/\r?\n/)) {
       const s = line.trim();
       if (!s || s.startsWith('#')) continue;
       const i = s.indexOf('=');
       if (i < 0) continue;
-      const k = s.slice(0, i).trim();
-      const v = s.slice(i + 1).trim().replace(/^["']|["']$/g, '');
-      if (!(k in out)) out[k] = v;
+      out[s.slice(0, i).trim()] = s.slice(i + 1).trim().replace(/^["']|["']$/g, '');
     }
-  } catch { /* 没有 .env 就只用进程环境 */ }
+  } catch { /* 没有这个文件就当空 */ }
   return out;
+}
+
+let envCache = null;
+/**
+ * 配置优先级：进程环境变量 > ~/.dsh/tuwen/.env > 仓库 .env。
+ * 用户级配置压过仓库级：仓库可能是别人 clone 的，自己的 key 应该放家里。
+ */
+export function loadEnv(file = REPO_ENV_FILE) {
+  if (envCache) return envCache;
+  envCache = { ...parseEnvFile(file), ...parseEnvFile(USER_ENV_FILE), ...process.env };
+  return envCache;
+}
+/** 配置页保存之后要让当前进程看见新值 */
+export function reloadEnv() { envCache = null; return loadEnv(); }
+
+/** ffmpeg：环境变量 > 随包安装的 ffmpeg-static > PATH 里的 ffmpeg */
+export function ffmpegBin() {
+  const e = loadEnv();
+  return maybeFile(e.FFMPEG_PATH) || maybeFile(safeRequire('ffmpeg-static')) || 'ffmpeg';
+}
+/** ffprobe：环境变量 > ffprobe-static > PATH */
+export function ffprobeBin() {
+  const e = loadEnv();
+  const stat = safeRequire('ffprobe-static');
+  return maybeFile(e.FFPROBE_PATH) || maybeFile(stat?.path || stat) || 'ffprobe';
 }
 
 export const sha1 = (s) => createHash('sha1').update(s).digest('hex').slice(0, 16);
@@ -56,12 +98,12 @@ export function run(cmd, args, opts = {}) {
 
 /** 运行 ffmpeg，失败时抛出带 stderr 的错误。 */
 export async function ffmpeg(args, opts = {}) {
-  return run(opts.bin || 'ffmpeg', ['-hide_banner', '-loglevel', 'error', ...args], opts);
+  return run(opts.bin || ffmpegBin(), ['-hide_banner', '-loglevel', 'error', ...args], opts);
 }
 
 /** 运行 ffprobe，返回 JSON。 */
 export async function ffprobe(file) {
-  const { stdout } = await run('ffprobe', [
+  const { stdout } = await run(ffprobeBin(), [
     '-v', 'error', '-show_format', '-show_streams', '-of', 'json', file,
   ]);
   return JSON.parse(stdout.toString('utf8'));

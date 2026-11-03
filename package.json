@@ -1,17 +1,45 @@
 {
   "name": "tuwen-studio",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.0",
+  "description": "图文视频工坊：一句主题 → 配音、画面、动效、字幕、成片",
+  "license": "MIT",
   "type": "module",
-  "description": "图文视频工坊 · 内核引擎：project.json -> 成片",
-  "bin": { "tuwen": "./src/cli.js" },
+  "private": false,
+  "bin": {
+    "tuwen": "./src/cli.js"
+  },
+  "exports": {
+    ".": "./src/cli.js",
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=20.11"
+  },
+  "files": [
+    "src/",
+    "stage/",
+    "studio/",
+    "scripts/",
+    "docs/",
+    "specs/",
+    "test/",
+    "assets/",
+    "DESIGN.md",
+    ".env.example"
+  ],
   "scripts": {
+    "postinstall": "node scripts/postinstall.mjs",
+    "setup": "node src/cli.js setup",
+    "doctor": "node src/cli.js doctor",
     "demo": "node src/cli.js demo",
     "render": "node src/cli.js render",
     "test": "node test/smoke.mjs && node test/gate.mjs",
     "test:real": "node test/smoke.mjs --real"
   },
   "dependencies": {
+    "ffmpeg-static": "^5.3.0",
+    "ffprobe-static": "^3.1.0",
+    "msedge-tts": "^2.1.1",
     "playwright": "1.58.0"
   }
 }

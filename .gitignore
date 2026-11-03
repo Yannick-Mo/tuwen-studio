@@ -9,9 +9,12 @@ projects/*/out/
 projects/*/assets/
 .env
 *.log
+*.tgz
 
 # 冒烟测试的产物，每次跑都会重建
 projects/smoke/
 projects/longform/
 projects/resume/
+projects/gate-test/
+projects/tts-node-test/
 projects/*/out/history/
