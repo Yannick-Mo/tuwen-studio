@@ -1,0 +1,123 @@
+{
+  "ok": true,
+  "id": "skyblue",
+  "title": "为什么天空是蓝色的",
+  "aspect": "9:16",
+  "scenes": [
+    {
+      "index": 1,
+      "id": "s1",
+      "narration": "天空本来没有颜色，是空气染出了蓝。",
+      "voiceSeconds": 2.94,
+      "shotSeconds": 3.43,
+      "shot": "超广角仰拍大全景，天空占满画面",
+      "framing": "",
+      "subject": "从树下仰拍，画面上方是纯净深蓝的天空，边缘被深色树梢剪影切出不规则的形状，天光从上往下渐亮",
+      "cast": [],
+      "transition": "zoom-blur 0.5s",
+      "prompt": "超广角仰拍大全景，天空占满画面，从树下仰拍，画面上方是纯净深蓝的天空，边缘被深色树梢剪影切出不规则的形状，天光从上往下渐亮，cinematic science illustration, volumetric light, deep blue and warm amber, ultra detailed, photorealistic light, no text, no people，竖屏 9:16 构图，画面中上部是主体，底部保留大面积暗部空间以便叠加字幕，画面中不要出现任何文字、字母、水印、标志、边框、分屏，也不要出现人物或剪影"
+    },
+    {
+      "index": 2,
+      "id": "s2",
+      "narration": "可离开大气再看，同一片天是纯黑的。",
+      "voiceSeconds": 3.04,
+      "shotSeconds": 3.47,
+      "shot": "超广角大全景，地球弧线位于画面下三分之一",
+      "framing": "",
+      "subject": "从近地轨道回望地球边缘，下方是薄薄一层由深蓝过渡到暖橙的发光大气，上方是无边纯黑的太空和稀疏星点",
+      "cast": [],
+      "transition": "crossfade 0.45s",
+      "prompt": "超广角大全景，地球弧线位于画面下三分之一，从近地轨道回望地球边缘，下方是薄薄一层由深蓝过渡到暖橙的发光大气，上方是无边纯黑的太空和稀疏星点，cinematic science illustration, volumetric light, deep blue and warm amber, ultra detailed, photorealistic light, no text, no people，竖屏 9:16 构图，画面中上部是主体，底部保留大面积暗部空间以便叠加字幕，画面中不要出现任何文字、字母、水印、标志、边框、分屏，也不要出现人物或剪影"
+    },
+    {
+      "index": 3,
+      "id": "s3",
+      "narration": "阳光看着是白的，拆开是七种颜色。",
+      "voiceSeconds": 2.81,
+      "shotSeconds": 3.23,
+      "shot": "中景，棱镜位于画面中央偏下",
+      "framing": "",
+      "subject": "黑暗里一块三角棱镜，一束白光射入后散成七色光带打在背景上，空气里有悬浮的尘埃颗粒被照亮",
+      "cast": [],
+      "transition": "whip-pan 0.4s",
+      "prompt": "中景，棱镜位于画面中央偏下，黑暗里一块三角棱镜，一束白光射入后散成七色光带打在背景上，空气里有悬浮的尘埃颗粒被照亮，cinematic science illustration, volumetric light, deep blue and warm amber, ultra detailed, photorealistic light, no text, no people，竖屏 9:16 构图，画面中上部是主体，底部保留大面积暗部空间以便叠加字幕，画面中不要出现任何文字、字母、水印、标志、边框、分屏，也不要出现人物或剪影"
+    },
+    {
+      "index": 4,
+      "id": "s4",
+      "narration": "光冲进大气层，撞上无数氧和氮分子。",
+      "voiceSeconds": 3.6,
+      "shotSeconds": 4.03,
+      "shot": "极特写，分子球体占满画面",
+      "framing": "",
+      "subject": "微观视角，无数直径相同的透明球体悬浮在深蓝空间里，一束白光从左上斜射进来撞在球体上，球体边缘被照亮",
+      "cast": [],
+      "transition": "crossfade 0.4s",
+      "prompt": "极特写，分子球体占满画面，微观视角，无数直径相同的透明球体悬浮在深蓝空间里，一束白光从左上斜射进来撞在球体上，球体边缘被照亮，cinematic science illustration, volumetric light, deep blue and warm amber, ultra detailed, photorealistic light, no text, no people，竖屏 9:16 构图，画面中上部是主体，底部保留大面积暗部空间以便叠加字幕，画面中不要出现任何文字、字母、水印、标志、边框、分屏，也不要出现人物或剪影"
+    },
+    {
+      "index": 5,
+      "id": "s5",
+      "narration": "红光波长大，擦着分子过去，几乎不拐弯。",
+      "voiceSeconds": 2.94,
+      "shotSeconds": 3.37,
+      "shot": "中景，红色光带横向贯穿画面",
+      "framing": "",
+      "subject": "一条长长的暖红色波状光带笔直穿过悬浮的透明球体群，几乎没有偏折，身后拖出一条暖橙色的轨迹",
+      "cast": [],
+      "transition": "crossfade 0.4s",
+      "prompt": "中景，红色光带横向贯穿画面，一条长长的暖红色波状光带笔直穿过悬浮的透明球体群，几乎没有偏折，身后拖出一条暖橙色的轨迹，cinematic science illustration, volumetric light, deep blue and warm amber, ultra detailed, photorealistic light, no text, no people，竖屏 9:16 构图，画面中上部是主体，底部保留大面积暗部空间以便叠加字幕，画面中不要出现任何文字、字母、水印、标志、边框、分屏，也不要出现人物或剪影"
+    },
+    {
+      "index": 6,
+      "id": "s6",
+      "narration": "蓝光波长短，被撞得四处乱飞，铺满天空。",
+      "voiceSeconds": 3.56,
+      "shotSeconds": 4,
+      "shot": "超广角全景，蓝色射线充满画面",
+      "framing": "",
+      "subject": "一条波长短的蓝色光带撞上透明球体后向四面八方炸开，无数细密的蓝色光线填满整个深色空间，越远越淡",
+      "cast": [],
+      "transition": "zoom-blur 0.5s",
+      "prompt": "超广角全景，蓝色射线充满画面，一条波长短的蓝色光带撞上透明球体后向四面八方炸开，无数细密的蓝色光线填满整个深色空间，越远越淡，cinematic science illustration, volumetric light, deep blue and warm amber, ultra detailed, photorealistic light, no text, no people，竖屏 9:16 构图，画面中上部是主体，底部保留大面积暗部空间以便叠加字幕，画面中不要出现任何文字、字母、水印、标志、边框、分屏，也不要出现人物或剪影"
+    },
+    {
+      "index": 7,
+      "id": "s7",
+      "narration": "所以不管往哪看，四面八方都是蓝的。",
+      "voiceSeconds": 3.32,
+      "shotSeconds": 3.77,
+      "shot": "超广角大全景，穹顶占据画面上部三分之二",
+      "framing": "",
+      "subject": "地面视角的完整天空穹顶，蓝色从四面八方均匀铺开，地平线压着一圈暖橙色，天空没有云，近地面的空气微微发亮",
+      "cast": [],
+      "transition": "crossfade 0.6s",
+      "prompt": "超广角大全景，穹顶占据画面上部三分之二，地面视角的完整天空穹顶，蓝色从四面八方均匀铺开，地平线压着一圈暖橙色，天空没有云，近地面的空气微微发亮，cinematic science illustration, volumetric light, deep blue and warm amber, ultra detailed, photorealistic light, no text, no people，竖屏 9:16 构图，画面中上部是主体，底部保留大面积暗部空间以便叠加字幕，画面中不要出现任何文字、字母、水印、标志、边框、分屏，也不要出现人物或剪影"
+    },
+    {
+      "index": 8,
+      "id": "s8",
+      "narration": "日落时阳光斜穿大气，蓝散尽，只剩橙红。",
+      "voiceSeconds": 3.61,
+      "shotSeconds": 4.03,
+      "shot": "超广角大全景，地平线位于画面下三分之一",
+      "framing": "",
+      "subject": "地平线上的落日，半边天被烧成橙红色，低空云层染成铜红，只有头顶最高处还残留一条细细的深蓝",
+      "cast": [],
+      "transition": "crossfade 0.6s",
+      "prompt": "超广角大全景，地平线位于画面下三分之一，地平线上的落日，半边天被烧成橙红色，低空云层染成铜红，只有头顶最高处还残留一条细细的深蓝，cinematic science illustration, volumetric light, deep blue and warm amber, ultra detailed, photorealistic light, no text, no people，竖屏 9:16 构图，画面中上部是主体，底部保留大面积暗部空间以便叠加字幕，画面中不要出现任何文字、字母、水印、标志、边框、分屏，也不要出现人物或剪影"
+    }
+  ],
+  "totals": {
+    "scenes": 8,
+    "images": 8,
+    "characterSheets": 0,
+    "estimatedSeconds": 29.37,
+    "durationSource": "measured",
+    "frames": 881,
+    "estimatedMinutes": 1.3
+  },
+  "problems": [],
+  "warnings": []
+}

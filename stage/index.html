@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>tuwen stage</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+  * { box-sizing: border-box; }
+  #root { position: relative; overflow: hidden; background: #000; transform: translateZ(0); }
+  .scene { position: absolute; inset: 0; overflow: hidden; }
+  .lyr { position: absolute; inset: 0; overflow: hidden; }
+  #captions {
+    position: absolute; left: 0; right: 0; z-index: 900; text-align: center;
+    pointer-events: none; will-change: transform, opacity;
+  }
+  #captions .cap-line { display: block; white-space: pre; will-change: transform, opacity; }
+  #captions .w { display: inline-block; white-space: pre; }
+  #captions .w.on { color: #ffd166; }
+  #fx { position: absolute; inset: 0; z-index: 800; pointer-events: none; }
+  #vignette { position: absolute; inset: 0; z-index: 960; pointer-events: none; opacity: 0; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="./runtime.js"></script>
+</body>
+</html>

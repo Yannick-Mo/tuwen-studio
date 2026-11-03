@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>图文视频工坊 · 工作台</title>
+<link rel="stylesheet" href="/studio/style.css" />
+</head>
+<body>
+<header>
+  <h1>图文视频工坊</h1>
+  <select id="projects" aria-label="选择项目"></select>
+  <span id="meta"></span>
+  <span id="badge" class="badge"></span>
+</header>
+
+<main>
+  <aside id="shots" aria-label="分镜列表"></aside>
+
+  <section id="stage">
+    <video id="player" controls playsinline poster=""></video>
+    <div id="current"></div>
+  </section>
+
+  <aside id="inspector">
+    <h2>镜头 <span id="sid">—</span></h2>
+    <div id="shotmeta" class="meta"></div>
+    <label for="prompt">画面描述</label>
+    <textarea id="prompt" rows="5" placeholder="这面镜要画什么……"></textarea>
+    <div class="row">
+      <button id="btn-regen" class="primary">重新出图 + 重渲</button>
+      <button id="btn-rerender">只重渲</button>
+    </div>
+    <p class="hint">重新出图约 25 秒、花一张图；只重渲不花钱，约 15 秒。</p>
+    <div id="status" class="status"></div>
+  </aside>
+</main>
+
+<script src="/studio/app.js"></script>
+</body>
+</html>

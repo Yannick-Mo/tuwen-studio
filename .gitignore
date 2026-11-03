@@ -1,0 +1,14 @@
+node_modules/
+.cache/
+.models/
+.tmp/
+projects/*/work/
+projects/*/voice/
+projects/*/img/
+projects/*/out/
+projects/*/assets/
+.env
+*.log
+
+# 冒烟测试的产物，每次跑都会重建
+projects/smoke/

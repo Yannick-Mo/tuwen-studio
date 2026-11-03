@@ -1,0 +1,77 @@
+{
+  "id": "chapter01",
+  "title": "第三章 · 寂静的驾驶舱",
+  "aspect": "9:16",
+  "style": {
+    "token": "cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic",
+    "palette": ["#05070d", "#1b4b6b", "#f97316"],
+    "grade": "teal-orange-soft"
+  },
+  "characters": [
+    {
+      "id": "lin",
+      "name": "林夏",
+      "look": "二十二岁中国女性，齐肩黑色短发，左眉上方一道细疤，眼神冷静，皮肤质感真实",
+      "outfit": "橙色战术太空服，领口金属环，黑色高领内衬"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "s1",
+      "narration": "凌晨三点，她在驾驶舱里醒了过来。",
+      "cast": ["lin"],
+      "visual": {
+        "subject": "昏暗的飞船驾驶舱内部，她靠在座椅上刚睁开眼，仪表盘发出冷蓝微光，空气里有细尘",
+        "shot": "中景，人物位于画面中上部，环境占两侧"
+      },
+      "transitionOut": { "type": "crossfade", "duration": 0.45 }
+    },
+    {
+      "id": "s2",
+      "narration": "舷窗外，地球已经不见了。",
+      "cast": ["lin"],
+      "visual": {
+        "subject": "她贴在舷窗玻璃上向外看，窗外只有深空和一条细长星带，玻璃有反光",
+        "shot": "侧后方过肩视角，人物背影与侧脸各占一半"
+      },
+      "transitionOut": { "type": "zoom-blur", "duration": 0.5 }
+    },
+    {
+      "id": "s3",
+      "narration": "警报响了第三遍。",
+      "visual": {
+        "subject": "驾驶舱顶部的警报灯旋转，红色光扫过金属舱壁和仪表台，烟雾轻微",
+        "shot": "极特写，红色警报灯占满画面"
+      },
+      "transitionOut": { "type": "whip-pan", "duration": 0.4 }
+    },
+    {
+      "id": "s4",
+      "narration": "她盯着屏幕上那行字，没有动。",
+      "cast": ["lin"],
+      "visual": {
+        "subject": "她的脸部特写，屏幕蓝光从下方打亮半张脸，眼神没有焦点，睫毛清晰",
+        "shot": "面部特写，人物居中，背景完全虚化"
+      },
+      "transitionOut": { "type": "crossfade", "duration": 0.45 }
+    },
+    {
+      "id": "s5",
+      "narration": "然后她按下了那个红色的按钮。",
+      "visual": {
+        "subject": "一只戴黑色手套的手伸向控制台上的红色按钮，指尖刚要触到，周围是冷色仪表",
+        "shot": "手部特写，浅景深，按钮是画面最亮处"
+      },
+      "transitionOut": { "type": "flash", "duration": 0.4 }
+    },
+    {
+      "id": "s6",
+      "narration": "一切安静得，像是什么都没发生过。",
+      "cast": ["lin"],
+      "visual": {
+        "subject": "驾驶舱全景，她背对镜头坐在座椅上，所有屏幕都暗了，只有星光照进来",
+        "shot": "大全景，人物很小，环境占主导"
+      }
+    }
+  ]
+}

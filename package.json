@@ -1,0 +1,17 @@
+{
+  "name": "tuwen-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "图文视频工坊 · 内核引擎：project.json -> 成片",
+  "bin": { "tuwen": "./src/cli.js" },
+  "scripts": {
+    "demo": "node src/cli.js demo",
+    "render": "node src/cli.js render",
+    "test": "node test/smoke.mjs",
+    "test:real": "node test/smoke.mjs --real"
+  },
+  "dependencies": {
+    "playwright": "1.58.0"
+  }
+}

@@ -1,0 +1,451 @@
+{
+  "version": 1,
+  "id": "dialogue",
+  "meta": {
+    "title": "双人对白 · 三个声音",
+    "template": "knowledge-v1",
+    "aspect": "9:16",
+    "size": [
+      1080,
+      1920
+    ],
+    "fps": 30,
+    "lang": "zh-CN",
+    "platform": "douyin"
+  },
+  "style": {
+    "preset": "",
+    "token": "cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic",
+    "negative": "text, watermark, logo, extra fingers, deformed hands",
+    "palette": [
+      "#05070d",
+      "#1b4b6b",
+      "#f97316"
+    ],
+    "grade": "teal-orange-soft",
+    "caption": "karaoke"
+  },
+  "voice": {
+    "provider": "edge",
+    "name": "zh-CN-YunyangNeural",
+    "rate": "+4%",
+    "pitch": "+0Hz",
+    "preset": "news"
+  },
+  "audio": {
+    "bgm": null,
+    "bgmGain": -9,
+    "duck": true,
+    "loudness": -14,
+    "tailFade": 0.6,
+    "bgmStyle": "tense"
+  },
+  "deliver": {
+    "burnSubtitles": true,
+    "cover": true,
+    "srt": true,
+    "aigcLabel": true,
+    "crf": 18
+  },
+  "timeline": {
+    "totalFrames": 406,
+    "totalDuration": 13.533333333333333,
+    "fps": 30
+  },
+  "characters": [
+    {
+      "id": "lin",
+      "name": "林夏",
+      "look": "二十二岁中国女性，齐肩黑色短发，左眉上方一道细疤，眼神冷静，皮肤质感真实",
+      "outfit": "橙色战术太空服，领口金属环，黑色高领内衬",
+      "voice": {
+        "preset": "warm"
+      },
+      "sheet": null
+    },
+    {
+      "id": "zhou",
+      "name": "周野",
+      "look": "三十岁中国男性，寸头，短络腮胡，右眉骨一道旧伤，皮肤粗糙，眼神疲惫",
+      "outfit": "深灰色工装外套，袖口磨损，黑色内搭",
+      "voice": {
+        "preset": "passion"
+      },
+      "sheet": null
+    }
+  ],
+  "scenes": [
+    {
+      "id": "s1",
+      "narration": "应急灯亮起来的时候，两个人已经三天没说话了。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "应急灯亮起来的时候，两个人已经三天没说话了。",
+          "start": 0.42,
+          "end": 4.722,
+          "words": [
+            {
+              "w": "应急灯亮起来的时候，两个人已经三天没说话了。",
+              "start": 0.5,
+              "end": 4.562
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/dialogue/img/s1.jpg",
+          "motion": {
+            "preset": "push-in",
+            "amount": 0.08,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "crossfade",
+        "duration": 0.5
+      },
+      "voice": {
+        "rate": "+0%",
+        "pitch": "-2Hz",
+        "delivery": "open"
+      },
+      "speaker": null,
+      "visual": {
+        "subject": "驾驶舱里只有应急灯的橙色光，林夏和周野隔着一张控制台站着，谁也不看谁，空气里飘着细小的灰尘",
+        "shot": "中景双人，左右各占一半画面"
+      },
+      "cast": [
+        "lin",
+        "zhou"
+      ],
+      "start": 0,
+      "duration": 4,
+      "voiceStart": 0.4,
+      "voiceDur": 3.3489166666666668,
+      "meta": {}
+    },
+    {
+      "id": "s2",
+      "narration": "你按了那个按钮。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "你按了那个按钮。",
+          "start": 0.453,
+          "end": 2.607,
+          "words": [
+            {
+              "w": "你按了那个按钮。",
+              "start": 0.533,
+              "end": 2.447
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/dialogue/img/s2.jpg",
+          "motion": {
+            "preset": "push-in",
+            "amount": 0.12,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "cut",
+        "duration": 0.2
+      },
+      "pauseBefore": 0.55,
+      "voice": {
+        "name": "zh-CN-YunjianNeural",
+        "rate": "+12%",
+        "pitch": "-2Hz",
+        "preset": "passion"
+      },
+      "speaker": "zhou",
+      "visual": {
+        "subject": "周野的脸部特写，眉头压着，右眉骨旧伤在侧光下很明显，嘴唇刚张开，下巴有一层胡茬",
+        "shot": "面部特写，占画面高度三分之二以上"
+      },
+      "cast": [
+        "zhou"
+      ],
+      "start": 4.133333333333334,
+      "duration": 1.8333333333333333,
+      "voiceStart": 4.566666666666666,
+      "voiceDur": 1.1358125,
+      "meta": {}
+    },
+    {
+      "id": "s3",
+      "narration": "我没有。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "我没有。",
+          "start": 0.453,
+          "end": 1.942,
+          "words": [
+            {
+              "w": "我没有。",
+              "start": 0.533,
+              "end": 1.782
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/dialogue/img/s3.jpg",
+          "motion": {
+            "preset": "still",
+            "amount": 0.02,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "cut",
+        "duration": 0.2
+      },
+      "pauseBefore": 0.45,
+      "voice": {
+        "name": "zh-CN-XiaoxiaoNeural",
+        "rate": "+2%",
+        "pitch": "+0Hz",
+        "preset": "warm"
+      },
+      "speaker": "lin",
+      "visual": {
+        "subject": "林夏的脸部特写，眼睛直直看着镜头，左眉上方那道细疤清晰，橙色太空服的反光落在下巴上",
+        "shot": "面部特写，占画面高度三分之二以上"
+      },
+      "cast": [
+        "lin"
+      ],
+      "start": 6,
+      "duration": 1.3666666666666667,
+      "voiceStart": 6.433333333333334,
+      "voiceDur": 0.6697083333333333,
+      "meta": {}
+    },
+    {
+      "id": "s4",
+      "narration": "监控拍到了。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "监控拍到了。",
+          "start": 0.453,
+          "end": 2.518,
+          "words": [
+            {
+              "w": "监控拍到了。",
+              "start": 0.533,
+              "end": 2.358
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/dialogue/img/s4.jpg",
+          "motion": {
+            "preset": "shake",
+            "amount": 0.08,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "cut",
+        "duration": 0.2
+      },
+      "pauseBefore": 0.45,
+      "voice": {
+        "name": "zh-CN-YunjianNeural",
+        "rate": "+12%",
+        "pitch": "-2Hz",
+        "preset": "passion"
+      },
+      "speaker": "zhou",
+      "visual": {
+        "subject": "周野偏过头，把一块金属牌拍在控制台上，指节用力，红色仪表光照在他的手背上",
+        "shot": "中近景，人物偏右，左侧留空"
+      },
+      "cast": [
+        "zhou"
+      ],
+      "start": 7.4,
+      "duration": 1.7333333333333334,
+      "voiceStart": 7.833333333333333,
+      "voiceDur": 1.0397291666666666,
+      "meta": {}
+    },
+    {
+      "id": "s5",
+      "narration": "那你为什么不报告？",
+      "audio": null,
+      "captions": [
+        {
+          "text": "那你为什么不报告？",
+          "start": 0.453,
+          "end": 2.483,
+          "words": [
+            {
+              "w": "那你为什么不报告？",
+              "start": 0.533,
+              "end": 2.323
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/dialogue/img/s5.jpg",
+          "motion": {
+            "preset": "push-in",
+            "amount": 0.1,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "crossfade",
+        "duration": 0.5
+      },
+      "pauseBefore": 0.45,
+      "voice": {
+        "name": "zh-CN-XiaoxiaoNeural",
+        "rate": "+8%",
+        "pitch": "+1Hz",
+        "preset": "warm",
+        "delivery": "build"
+      },
+      "speaker": "lin",
+      "visual": {
+        "subject": "林夏往前走了半步，仰头看着周野的方向，应急灯的橙光把她的侧脸切出一道硬边",
+        "shot": "近景，人物仰角，占画面下部"
+      },
+      "cast": [
+        "lin"
+      ],
+      "start": 9.133333333333333,
+      "duration": 1.9666666666666666,
+      "voiceStart": 9.566666666666666,
+      "voiceDur": 1.2676666666666667,
+      "meta": {}
+    },
+    {
+      "id": "s6",
+      "narration": "他没有回答。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "他没有回答。",
+          "start": 0.453,
+          "end": 2.288,
+          "words": [
+            {
+              "w": "他没有回答。",
+              "start": 0.533,
+              "end": 2.128
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/dialogue/img/s6.jpg",
+          "motion": {
+            "preset": "pull-out",
+            "amount": 0.1,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "crossfade",
+        "duration": 0.6
+      },
+      "pauseBefore": 0.55,
+      "voice": {
+        "rate": "-2%",
+        "pitch": "+0Hz",
+        "delivery": "close"
+      },
+      "speaker": null,
+      "visual": {
+        "subject": "两个人并排站着背对镜头，面前是巨大的舷窗和星空，应急灯把他们的影子拉得很长",
+        "shot": "超广角大全景，环境占画面主导"
+      },
+      "cast": [
+        "lin",
+        "zhou"
+      ],
+      "start": 11.233333333333333,
+      "duration": 2.3,
+      "voiceStart": 11.666666666666666,
+      "voiceDur": 0.9273125,
+      "meta": {}
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "smoke",
+  "title": "冒烟测试",
+  "aspect": "9:16",
+  "style": { "preset": "flat" },
+  "scenes": [
+    {
+      "id": "s1",
+      "narration": "第一句用来测试整条流水线。",
+      "visual": { "subject": "深蓝底色上一个白色的圆" },
+      "transitionOut": { "type": "crossfade", "duration": 0.4 }
+    },
+    {
+      "id": "s2",
+      "narration": "第二句检查配音和时间轴。",
+      "visual": { "subject": "橙色底色上一个白色的方" },
+      "transitionOut": { "type": "cut", "duration": 0.2 }
+    },
+    {
+      "id": "s3",
+      "narration": "第三句检查收尾和质检。",
+      "visual": { "subject": "黑色底色上一条白色的线" }
+    }
+  ]
+}

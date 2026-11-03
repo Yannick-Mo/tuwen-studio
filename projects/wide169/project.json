@@ -1,0 +1,291 @@
+{
+  "version": 1,
+  "id": "wide169",
+  "meta": {
+    "title": "潮汐 · 横屏试拍",
+    "template": "knowledge-v1",
+    "aspect": "16:9",
+    "size": [
+      1920,
+      1080
+    ],
+    "fps": 30,
+    "lang": "zh-CN",
+    "platform": "douyin"
+  },
+  "style": {
+    "preset": "cinematic",
+    "token": "cinematic film still, volumetric light, shallow depth of field, 35mm, photorealistic, ultra detailed",
+    "negative": "text, watermark, logo, extra fingers, deformed hands, cartoon, anime, illustration, flat colors",
+    "palette": [
+      "#050a18",
+      "#1c4b7a",
+      "#ff9a4d"
+    ],
+    "grade": "teal-orange-soft",
+    "caption": "karaoke"
+  },
+  "voice": {
+    "provider": "edge",
+    "name": "zh-CN-YunyangNeural",
+    "rate": "+4%",
+    "pitch": "+0Hz",
+    "preset": "news",
+    "engineUsed": "edge"
+  },
+  "audio": {
+    "bgm": null,
+    "bgmGain": -9,
+    "duck": true,
+    "loudness": -14,
+    "tailFade": 0.6,
+    "bgmStyle": "warm"
+  },
+  "deliver": {
+    "burnSubtitles": true,
+    "cover": true,
+    "srt": true,
+    "aigcLabel": true,
+    "crf": 18
+  },
+  "timeline": {
+    "totalFrames": 408,
+    "totalDuration": 13.6,
+    "fps": 30
+  },
+  "characters": [],
+  "scenes": [
+    {
+      "id": "s1",
+      "narration": "海边一天涨落两次，是谁在拉这根绳？",
+      "audio": null,
+      "captions": [
+        {
+          "text": "海边一天涨落两次，是谁在拉这根绳？",
+          "start": 0.42,
+          "end": 4.247,
+          "words": [
+            {
+              "w": "海边一天涨落两次，是谁在拉这根绳？",
+              "start": 0.5,
+              "end": 4.087
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/wide169/img/s1.jpg",
+          "motion": {
+            "preset": "push-in",
+            "amount": 0.08,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "crossfade",
+        "duration": 0.5
+      },
+      "voice": {
+        "rate": "+0%",
+        "pitch": "-2Hz",
+        "delivery": "open"
+      },
+      "speaker": null,
+      "performance": null,
+      "visual": {
+        "subject": "黄昏的海岸线航拍，退潮后的滩涂留下层层水痕，远处海面泛着暖橙色反光",
+        "shot": "超广角航拍大全景，地平线位于画面上三分之一"
+      },
+      "cast": [],
+      "start": 0,
+      "duration": 3.6333333333333333,
+      "voiceStart": 0.4,
+      "voiceDur": 2.976729166666667,
+      "meta": {}
+    },
+    {
+      "id": "s2",
+      "narration": "答案在三十八万公里外——月球。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "答案在三十八万公里外——月球。",
+          "start": 0.453,
+          "end": 3.443,
+          "words": [
+            {
+              "w": "答案在三十八万公里外——月球。",
+              "start": 0.533,
+              "end": 3.283
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/wide169/img/s2.jpg",
+          "motion": {
+            "preset": "pull-out",
+            "amount": 0.1,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "zoom-blur",
+        "duration": 0.45
+      },
+      "voice": null,
+      "speaker": null,
+      "performance": null,
+      "visual": {
+        "subject": "月球悬在纯黑深空中，表面环形山被侧光照亮，边缘有一圈极淡的蓝边",
+        "shot": "中景，月球位于画面中央偏右"
+      },
+      "cast": [],
+      "start": 3.3666666666666667,
+      "duration": 2.8333333333333335,
+      "voiceStart": 3.8,
+      "voiceDur": 2.1337916666666668,
+      "meta": {}
+    },
+    {
+      "id": "s3",
+      "narration": "它把地球朝它那一面的海水拉高。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "它把地球朝它那一面的海水拉高。",
+          "start": 0.453,
+          "end": 3.574,
+          "words": [
+            {
+              "w": "它把地球朝它那一面的海水拉高。",
+              "start": 0.533,
+              "end": 3.414
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/wide169/img/s3.jpg",
+          "motion": {
+            "preset": "drift",
+            "amount": 0.07,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "crossfade",
+        "duration": 0.45
+      },
+      "voice": {
+        "rate": "+10%",
+        "pitch": "+1Hz",
+        "delivery": "build"
+      },
+      "speaker": null,
+      "performance": null,
+      "visual": {
+        "subject": "从太空侧视地球，海洋表面朝月球方向被拉出一个平缓的隆起，月光斜射在海面上",
+        "shot": "大全景，地球弧线横贯画面"
+      },
+      "cast": [],
+      "start": 5.933333333333334,
+      "duration": 3.033333333333333,
+      "voiceStart": 6.366666666666666,
+      "voiceDur": 2.3237083333333333,
+      "meta": {}
+    },
+    {
+      "id": "s4",
+      "narration": "地球自转穿过两个鼓包，一天就淹了两次。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "地球自转穿过两个鼓包，一天就淹了两次。",
+          "start": 0.453,
+          "end": 4.864,
+          "words": [
+            {
+              "w": "地球自转穿过两个鼓包，一天就淹了两次。",
+              "start": 0.533,
+              "end": 4.704
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/wide169/img/s4.jpg",
+          "motion": {
+            "preset": "pan-right",
+            "amount": 0.1,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "crossfade",
+        "duration": 0.6
+      },
+      "voice": {
+        "rate": "-2%",
+        "pitch": "+0Hz",
+        "delivery": "close"
+      },
+      "speaker": null,
+      "performance": null,
+      "visual": {
+        "subject": "俯视海岸，涨潮的海水漫过滩涂和礁石，细密的浪花边缘形成弧线",
+        "shot": "超广角俯拍大全景，海岸线贯穿画面"
+      },
+      "cast": [],
+      "start": 8.7,
+      "duration": 4.9,
+      "voiceStart": 9.133333333333333,
+      "voiceDur": 3.5347708333333334,
+      "meta": {}
+    }
+  ]
+}

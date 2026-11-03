@@ -1,0 +1,153 @@
+{
+  "ok": true,
+  "id": "dialogue",
+  "title": "双人对白 · 三个声音",
+  "aspect": "9:16",
+  "scenes": [
+    {
+      "index": 1,
+      "id": "s1",
+      "narration": "应急灯亮起来的时候，两个人已经三天没说话了。",
+      "voiceSeconds": 3.35,
+      "shotSeconds": 4,
+      "shot": "中景双人，左右各占一半画面",
+      "framing": "",
+      "subject": "驾驶舱里只有应急灯的橙色光，林夏和周野隔着一张控制台站着，谁也不看谁，空气里飘着细小的灰尘",
+      "cast": [
+        "林夏",
+        "周野"
+      ],
+      "speaker": "",
+      "voice": {
+        "rate": "+0%",
+        "pitch": "-2Hz",
+        "delivery": "open",
+        "name": ""
+      },
+      "transition": "crossfade 0.5s",
+      "prompt": "中景双人，左右各占一半画面，画面中的人物：左侧是林夏（二十二岁中国女性，齐肩黑色短发，左眉上方一道细疤，眼神冷静，皮肤质感真实，橙色战术太空服，领口金属环，黑色高领内衬）；右侧是周野（三十岁中国男性，寸头，短络腮胡，右眉骨一道旧伤，皮肤粗糙，眼神疲惫，深灰色工装外套，袖口磨损，黑色内搭）。参考图1是林夏，参考图2是周野；两个人不能串脸，五官、发型、伤疤、服装必须与参考图一致，驾驶舱里只有应急灯的橙色光，林夏和周野隔着一张控制台站着，谁也不看谁，空气里飘着细小的灰尘，cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic，竖屏 9:16 构图，主体位于画面中上部，底部三分之一保持简洁以便叠加字幕，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现第三个人，text, watermark, logo, extra fingers, deformed hands"
+    },
+    {
+      "index": 2,
+      "id": "s2",
+      "narration": "你按了那个按钮。",
+      "voiceSeconds": 1.14,
+      "shotSeconds": 1.83,
+      "shot": "面部特写，占画面高度三分之二以上",
+      "framing": "",
+      "subject": "周野的脸部特写，眉头压着，右眉骨旧伤在侧光下很明显，嘴唇刚张开，下巴有一层胡茬",
+      "cast": [
+        "周野"
+      ],
+      "speaker": "周野",
+      "voice": {
+        "rate": "+12%",
+        "pitch": "-2Hz",
+        "delivery": "",
+        "name": "zh-CN-YunjianNeural"
+      },
+      "transition": "cut 0.2s",
+      "prompt": "面部特写，占画面高度三分之二以上，画面中的人物：周野（三十岁中国男性，寸头，短络腮胡，右眉骨一道旧伤，皮肤粗糙，眼神疲惫，深灰色工装外套，袖口磨损，黑色内搭）。参考图1就是该人物，五官、发型、伤疤、服装必须与参考图一致，周野的脸部特写，眉头压着，右眉骨旧伤在侧光下很明显，嘴唇刚张开，下巴有一层胡茬，cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic，竖屏 9:16 构图，主体位于画面中上部，底部三分之一保持简洁以便叠加字幕，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现第三个人，text, watermark, logo, extra fingers, deformed hands"
+    },
+    {
+      "index": 3,
+      "id": "s3",
+      "narration": "我没有。",
+      "voiceSeconds": 0.67,
+      "shotSeconds": 1.37,
+      "shot": "面部特写，占画面高度三分之二以上",
+      "framing": "",
+      "subject": "林夏的脸部特写，眼睛直直看着镜头，左眉上方那道细疤清晰，橙色太空服的反光落在下巴上",
+      "cast": [
+        "林夏"
+      ],
+      "speaker": "林夏",
+      "voice": {
+        "rate": "+2%",
+        "pitch": "+0Hz",
+        "delivery": "",
+        "name": "zh-CN-XiaoxiaoNeural"
+      },
+      "transition": "cut 0.2s",
+      "prompt": "面部特写，占画面高度三分之二以上，画面中的人物：林夏（二十二岁中国女性，齐肩黑色短发，左眉上方一道细疤，眼神冷静，皮肤质感真实，橙色战术太空服，领口金属环，黑色高领内衬）。参考图1就是该人物，五官、发型、伤疤、服装必须与参考图一致，林夏的脸部特写，眼睛直直看着镜头，左眉上方那道细疤清晰，橙色太空服的反光落在下巴上，cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic，竖屏 9:16 构图，主体位于画面中上部，底部三分之一保持简洁以便叠加字幕，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现第三个人，text, watermark, logo, extra fingers, deformed hands"
+    },
+    {
+      "index": 4,
+      "id": "s4",
+      "narration": "监控拍到了。",
+      "voiceSeconds": 1.04,
+      "shotSeconds": 1.73,
+      "shot": "中近景，人物偏右，左侧留空",
+      "framing": "",
+      "subject": "周野偏过头，把一块金属牌拍在控制台上，指节用力，红色仪表光照在他的手背上",
+      "cast": [
+        "周野"
+      ],
+      "speaker": "周野",
+      "voice": {
+        "rate": "+12%",
+        "pitch": "-2Hz",
+        "delivery": "",
+        "name": "zh-CN-YunjianNeural"
+      },
+      "transition": "cut 0.2s",
+      "prompt": "中近景，人物偏右，左侧留空，画面中的人物：周野（三十岁中国男性，寸头，短络腮胡，右眉骨一道旧伤，皮肤粗糙，眼神疲惫，深灰色工装外套，袖口磨损，黑色内搭）。参考图1就是该人物，五官、发型、伤疤、服装必须与参考图一致，周野偏过头，把一块金属牌拍在控制台上，指节用力，红色仪表光照在他的手背上，cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic，竖屏 9:16 构图，主体位于画面中上部，底部三分之一保持简洁以便叠加字幕，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现第三个人，text, watermark, logo, extra fingers, deformed hands"
+    },
+    {
+      "index": 5,
+      "id": "s5",
+      "narration": "那你为什么不报告？",
+      "voiceSeconds": 1.27,
+      "shotSeconds": 1.97,
+      "shot": "近景，人物仰角，占画面下部",
+      "framing": "",
+      "subject": "林夏往前走了半步，仰头看着周野的方向，应急灯的橙光把她的侧脸切出一道硬边",
+      "cast": [
+        "林夏"
+      ],
+      "speaker": "林夏",
+      "voice": {
+        "rate": "+8%",
+        "pitch": "+1Hz",
+        "delivery": "build",
+        "name": "zh-CN-XiaoxiaoNeural"
+      },
+      "transition": "crossfade 0.5s",
+      "prompt": "近景，人物仰角，占画面下部，画面中的人物：林夏（二十二岁中国女性，齐肩黑色短发，左眉上方一道细疤，眼神冷静，皮肤质感真实，橙色战术太空服，领口金属环，黑色高领内衬）。参考图1就是该人物，五官、发型、伤疤、服装必须与参考图一致，林夏往前走了半步，仰头看着周野的方向，应急灯的橙光把她的侧脸切出一道硬边，cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic，竖屏 9:16 构图，主体位于画面中上部，底部三分之一保持简洁以便叠加字幕，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现第三个人，text, watermark, logo, extra fingers, deformed hands"
+    },
+    {
+      "index": 6,
+      "id": "s6",
+      "narration": "他没有回答。",
+      "voiceSeconds": 0.93,
+      "shotSeconds": 1.63,
+      "shot": "超广角大全景，环境占画面主导",
+      "framing": "",
+      "subject": "两个人并排站着背对镜头，面前是巨大的舷窗和星空，应急灯把他们的影子拉得很长",
+      "cast": [
+        "林夏",
+        "周野"
+      ],
+      "speaker": "",
+      "voice": {
+        "rate": "-2%",
+        "pitch": "+0Hz",
+        "delivery": "close",
+        "name": ""
+      },
+      "transition": "crossfade 0.6s",
+      "prompt": "超广角大全景，环境占画面主导，画面中的人物：左侧是林夏（二十二岁中国女性，齐肩黑色短发，左眉上方一道细疤，眼神冷静，皮肤质感真实，橙色战术太空服，领口金属环，黑色高领内衬）；右侧是周野（三十岁中国男性，寸头，短络腮胡，右眉骨一道旧伤，皮肤粗糙，眼神疲惫，深灰色工装外套，袖口磨损，黑色内搭）。参考图1是林夏，参考图2是周野；两个人不能串脸，五官、发型、伤疤、服装必须与参考图一致，两个人并排站着背对镜头，面前是巨大的舷窗和星空，应急灯把他们的影子拉得很长，cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic，竖屏 9:16 构图，主体位于画面中上部，底部三分之一保持简洁以便叠加字幕，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现第三个人，text, watermark, logo, extra fingers, deformed hands"
+    }
+  ],
+  "totals": {
+    "scenes": 6,
+    "images": 6,
+    "characterSheets": 2,
+    "estimatedSeconds": 13.53,
+    "durationSource": "measured",
+    "frames": 406,
+    "estimatedMinutes": 0.9
+  },
+  "problems": [],
+  "warnings": []
+}

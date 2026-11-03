@@ -1,0 +1,84 @@
+{
+  "id": "chapter02",
+  "title": "第四章 · 门开了",
+  "aspect": "9:16",
+  "style": {
+    "token": "cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic",
+    "palette": ["#05070d", "#1b4b6b", "#f97316"],
+    "grade": "teal-orange-soft"
+  },
+  "characters": [
+    {
+      "id": "lin",
+      "name": "林夏",
+      "look": "二十二岁中国女性，齐肩黑色短发，左眉上方一道细疤，眼神冷静，皮肤质感真实",
+      "outfit": "橙色战术太空服，领口金属环，黑色高领内衬"
+    },
+    {
+      "id": "zhou",
+      "name": "周野",
+      "look": "三十岁中国男性，寸头，短络腮胡，右眉骨一道旧伤，皮肤粗糙，眼神疲惫",
+      "outfit": "深灰色工装外套，袖口磨损，黑色内搭"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "s1",
+      "narration": "舱门开了。周野站在门口。",
+      "cast": ["zhou"],
+      "visual": {
+        "subject": "驾驶舱舱门口，周野站在逆光里，身后是走廊的冷白灯管，他手里捏着一块金属牌",
+        "shot": "中景，人物位于画面中上部"
+      },
+      "transitionOut": { "type": "crossfade", "duration": 0.45 }
+    },
+    {
+      "id": "s2",
+      "narration": "他说，你按了那个按钮。",
+      "cast": ["zhou"],
+      "visual": {
+        "subject": "周野的脸部特写，眉头压着，右眉骨的旧伤在侧光下很明显，嘴唇刚张开",
+        "shot": "面部特写，占画面高度三分之二以上"
+      },
+      "transitionOut": { "type": "zoom-blur", "duration": 0.5 }
+    },
+    {
+      "id": "s3",
+      "narration": "她没有回答。",
+      "cast": ["lin"],
+      "visual": {
+        "subject": "林夏坐在座椅上，眼睛看着地面，手在膝盖上攥紧，橙色太空服的反光落在下巴上",
+        "shot": "中近景，人物偏右，左侧留空"
+      },
+      "transitionOut": { "type": "crossfade", "duration": 0.45 }
+    },
+    {
+      "id": "s4",
+      "narration": "两个人在黑暗里对视。",
+      "cast": ["lin", "zhou"],
+      "visual": {
+        "subject": "驾驶舱里只剩应急灯，林夏和周野隔着控制台对视，中间是发红的仪表光",
+        "shot": "中景双人，左右各占一半画面"
+      },
+      "transitionOut": { "type": "whip-pan", "duration": 0.4 }
+    },
+    {
+      "id": "s5",
+      "narration": "舷窗外，星星开始移动。",
+      "visual": {
+        "subject": "舷窗外，星带缓慢横向移动，玻璃上有一层薄雾和指纹",
+        "shot": "极特写，舷窗玻璃占满画面"
+      },
+      "transitionOut": { "type": "crossfade", "duration": 0.5 }
+    },
+    {
+      "id": "s6",
+      "narration": "他们并排坐下，看着同一片星空。",
+      "cast": ["lin", "zhou"],
+      "visual": {
+        "subject": "驾驶舱全景，林夏和周野并排坐在两张座椅上，背对镜头，面前是巨大的舷窗和星空",
+        "shot": "超广角大全景，环境占画面主导"
+      }
+    }
+  ]
+}

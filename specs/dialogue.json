@@ -1,0 +1,100 @@
+{
+  "id": "dialogue",
+  "title": "双人对白 · 三个声音",
+  "aspect": "9:16",
+  "style": {
+    "token": "cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic",
+    "palette": ["#05070d", "#1b4b6b", "#f97316"],
+    "grade": "teal-orange-soft"
+  },
+  "voice": { "preset": "news" },
+  "characters": [
+    {
+      "id": "lin",
+      "name": "林夏",
+      "look": "二十二岁中国女性，齐肩黑色短发，左眉上方一道细疤，眼神冷静，皮肤质感真实",
+      "outfit": "橙色战术太空服，领口金属环，黑色高领内衬",
+      "voice": { "preset": "warm" }
+    },
+    {
+      "id": "zhou",
+      "name": "周野",
+      "look": "三十岁中国男性，寸头，短络腮胡，右眉骨一道旧伤，皮肤粗糙，眼神疲惫",
+      "outfit": "深灰色工装外套，袖口磨损，黑色内搭",
+      "voice": { "preset": "passion" }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "s1",
+      "narration": "应急灯亮起来的时候，两个人已经三天没说话了。",
+      "cast": ["lin", "zhou"],
+      "visual": {
+        "subject": "驾驶舱里只有应急灯的橙色光，林夏和周野隔着一张控制台站着，谁也不看谁，空气里飘着细小的灰尘",
+        "shot": "中景双人，左右各占一半画面"
+      },
+      "motion": { "preset": "push-in", "amount": 0.08 },
+      "transitionOut": { "type": "crossfade", "duration": 0.5 }
+    },
+    {
+      "id": "s2",
+      "narration": "你按了那个按钮。",
+      "cast": ["zhou"],
+      "speaker": "zhou",
+      "visual": {
+        "subject": "周野的脸部特写，眉头压着，右眉骨旧伤在侧光下很明显，嘴唇刚张开，下巴有一层胡茬",
+        "shot": "面部特写，占画面高度三分之二以上"
+      },
+      "motion": { "preset": "push-in", "amount": 0.12 },
+      "transitionOut": { "type": "cut", "duration": 0.2 }
+    },
+    {
+      "id": "s3",
+      "narration": "我没有。",
+      "cast": ["lin"],
+      "speaker": "lin",
+      "visual": {
+        "subject": "林夏的脸部特写，眼睛直直看着镜头，左眉上方那道细疤清晰，橙色太空服的反光落在下巴上",
+        "shot": "面部特写，占画面高度三分之二以上"
+      },
+      "motion": { "preset": "still", "amount": 0.02 },
+      "transitionOut": { "type": "cut", "duration": 0.2 }
+    },
+    {
+      "id": "s4",
+      "narration": "监控拍到了。",
+      "cast": ["zhou"],
+      "speaker": "zhou",
+      "visual": {
+        "subject": "周野偏过头，把一块金属牌拍在控制台上，指节用力，红色仪表光照在他的手背上",
+        "shot": "中近景，人物偏右，左侧留空"
+      },
+      "motion": { "preset": "shake", "amount": 0.08 },
+      "transitionOut": { "type": "cut", "duration": 0.2 }
+    },
+    {
+      "id": "s5",
+      "narration": "那你为什么不报告？",
+      "cast": ["lin"],
+      "speaker": "lin",
+      "visual": {
+        "subject": "林夏往前走了半步，仰头看着周野的方向，应急灯的橙光把她的侧脸切出一道硬边",
+        "shot": "近景，人物仰角，占画面下部"
+      },
+      "motion": { "preset": "push-in", "amount": 0.1 },
+      "transitionOut": { "type": "crossfade", "duration": 0.5 }
+    },
+    {
+      "id": "s6",
+      "narration": "他没有回答。",
+      "cast": ["lin", "zhou"],
+      "visual": {
+        "subject": "两个人并排站着背对镜头，面前是巨大的舷窗和星空，应急灯把他们的影子拉得很长",
+        "shot": "超广角大全景，环境占画面主导"
+      },
+      "motion": { "preset": "pull-out", "amount": 0.1 },
+      "transitionOut": { "type": "crossfade", "duration": 0.6 }
+    }
+  ],
+  "audio": { "bgmStyle": "tense" }
+}

@@ -1,0 +1,7 @@
+# 图文视频工坊：把剧本描述渲染成带配音/字幕/运镜的 mp4
+- insert:
+    - id: video-studio
+      name: '@local/dsh-video-studio'
+      config:
+        engineDir: 'D:\YannickFile\TuWenShiPin'
+        jobs: 4
