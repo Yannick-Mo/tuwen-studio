@@ -118,6 +118,18 @@ function selectShot(sid) {
   ].filter(Boolean);
   $('shotmeta').textContent = lines.join('\n');
   $('current').textContent = s.narration || '';
+
+  // 单镜试听：先猜 mp3，加载失败再退 wav（Piper 出的是 wav）
+  const audio = $('voice');
+  const base = `/projects/${state.id}/voice/${sid}`;
+  audio.dataset.tried = '';
+  audio.onerror = () => {
+    if (audio.dataset.tried === 'wav') { audio.removeAttribute('src'); return; }
+    audio.dataset.tried = 'wav';
+    audio.src = `${base}.wav`;
+  };
+  audio.src = `${base}.mp3`;
+
   const player = $('player');
   if (player.src && s.start != null) player.currentTime = Math.max(0, s.start + 0.05);
   setStatus('');

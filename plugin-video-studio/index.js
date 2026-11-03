@@ -280,6 +280,80 @@ export function apply(ctx, config = {}) {
     },
   }));
 
+  // -------------------------------------------------------------- review
+  ctx.effect(() => ctx.tools.register({
+    name: 'video_studio_review',
+    description: [
+      '审片清单：把一条片子的每一镜摊开——台词、对应的原图路径、配音路径、时长、说话人。',
+      '拿到之后逐张打开 image（用读图能力）确认：这张图有没有讲对那句话、有没有多余文字、主体有没有被切掉。这是唯一能查出「图不对题」的办法，质检查不出来。',
+      '同时可以用 voice 路径试听每一镜的配音。',
+    ].join('\n'),
+    parameters: {
+      projectId: { type: 'string', required: true, description: '项目 id' },
+    },
+    output: {
+      schema: {
+        type: 'object',
+        additionalProperties: true,
+        properties: {
+          ok: { type: 'boolean' },
+          projectId: { type: 'string' },
+          duration: { type: 'number' },
+          shots: { type: 'array', items: { type: 'object', additionalProperties: true } },
+          error: { type: 'string' },
+        },
+      },
+      render: (_a, v) => [{
+        type: 'text',
+        text: v.ok
+          ? [
+            `${v.projectId} · ${v.duration}s · ${v.shots.length} 镜`,
+            ...v.shots.map((s) => `${s.index + 1}. ${s.id} ${s.duration}s  ${s.narration}${s.speaker ? `  🗣${s.speaker}` : ''}\n   image: ${s.image || '缺失'}\n   voice: ${s.voice || '缺失'}`),
+          ].join('\n')
+          : `审片清单读取失败：${v.error}`,
+      }],
+    },
+    async execute(args) {
+      const id = String(args.projectId || '').trim();
+      if (!id) throw new Error('要指定 projectId');
+      try {
+        const dir = path.join(engineDir, 'projects', id);
+        const project = JSON.parse(await fs.readFile(path.join(dir, 'project.json'), 'utf8'));
+        const shots = [];
+        for (const [i, s] of (project.scenes || []).entries()) {
+          const image = path.join(dir, 'img', `${s.id}.jpg`);
+          const voiceCandidates = [`${s.id}.mp3`, `${s.id}.wav`].map((f) => path.join(dir, 'voice', f));
+          const hasImage = await fs.stat(image).then(() => true).catch(() => false);
+          let voice = null;
+          for (const f of voiceCandidates) {
+            if (await fs.stat(f).then(() => true).catch(() => false)) { voice = f; break; }
+          }
+          shots.push({
+            index: i,
+            id: s.id,
+            start: s.start,
+            duration: s.duration,
+            narration: s.narration,
+            speaker: s.speaker || '',
+            image: hasImage ? image : null,
+            voice,
+            hasCaption: !!(s.captions && s.captions.length),
+          });
+        }
+        return {
+          ok: true,
+          projectId: id,
+          title: project.meta?.title || '',
+          duration: project.timeline?.totalDuration || 0,
+          engine: project.voice?.engineUsed || project.voice?.engine || 'edge',
+          shots,
+        };
+      } catch (e) {
+        return { ok: false, error: String(e.message).slice(0, 300) };
+      }
+    },
+  }));
+
   // --------------------------------------------------------------- scene
   ctx.effect(() => ctx.tools.register({
     name: 'video_studio_scene',

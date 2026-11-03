@@ -124,6 +124,14 @@ export function buildStoryboard(spec, opts = {}) {
   const totalSeconds = +timeline.totalDuration.toFixed(2);
   const frames = timeline.totalFrames;
 
+  // 规模预警：这两条不是硬限制，是「会变慢/会不稳」的边界
+  if (sheets > 3) {
+    warnings.push(`有 ${sheets} 个角色，每个都要一张定妆照；同框参考图超过 3 张时模型容易串脸`);
+  }
+  if (totalSeconds > 300) {
+    warnings.push(`总长 ${totalSeconds}s（超过 5 分钟），渲染大约 ${Math.round((frames * 0.09) / 60)} 分钟，中途失败要整条重来`);
+  }
+
   return {
     ok: problems.length === 0,
     id: project.id,

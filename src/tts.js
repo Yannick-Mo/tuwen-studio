@@ -11,6 +11,8 @@ import { ensureDir, exists, ffprobe, run, sha1, log } from './util.js';
 const CACHE_DIR = path.resolve('.cache/tts');
 const BLOCK_FILE = path.resolve('.cache/edge-blocked.json');
 const BLOCK_MINUTES = 15;
+// 跨项目共用的 volc 音色锚点：没有它，每换一条片子就换一把嗓子
+const DEFAULT_ANCHOR = path.resolve('assets/volc-anchor.mp3');
 
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
@@ -140,8 +142,14 @@ export class VoiceEngine {
     if (this.volcRefs.has(k)) return;
     try {
       const buf = await fs.readFile(file);
-      if (buf.length >= 2048 && buf.length <= 10 * 1024 * 1024) {
-        this.volcRefs.set(k, buf.toString('base64'));
+      if (buf.length < 2048 || buf.length > 10 * 1024 * 1024) return;
+      this.volcRefs.set(k, buf.toString('base64'));
+      // 旁白的第一句顺手存成跨项目锚点，下次换片子还是这把嗓子
+      if (this.anchorPath && k === '__narrator__') {
+        await ensureDir(path.dirname(this.anchorPath));
+        await fs.writeFile(this.anchorPath, buf);
+        this.anchorPath = null;
+        log(`  · 已保存音色锚点 → ${path.relative(process.cwd(), DEFAULT_ANCHOR)}`);
       }
     } catch { /* 读不到就不锚定，至少还能出片 */ }
   }
@@ -235,16 +243,18 @@ export class VoiceEngine {
 async function runAll(project, outDir, engine, opts) {
   const voiceEngine = new VoiceEngine(project.voice, { ...opts, engine });
 
-  // 指定了参考音频就全场用它当锚点，比「第一句自动锚定」更稳
-  if (engine === 'volc' && project.voice?.reference) {
-    try {
-      const buf = await fs.readFile(path.resolve(project.voice.reference));
-      const b64 = buf.toString('base64');
-      for (const s of project.scenes) voiceEngine.volcRefs.set(voiceEngine.volcKey(s), b64);
-      voiceEngine.volcRefs.set('__narrator__', b64);
-      if (!opts.quiet) log(`  · 音色锚点：${project.voice.reference}`);
-    } catch {
-      if (!opts.quiet) log('  ! 参考音频读不到，改用第一句自动锚定');
+  // volc 的音色锚点：优先用指定的，其次用跨项目共用的那一个；
+  // 都没有就把第一句存成共用锚点，之后所有片子都用它——跨片音色才不会变。
+  if (engine === 'volc') {
+    const anchorPath = path.resolve(project.voice?.reference || DEFAULT_ANCHOR);
+    let buf = await fs.readFile(anchorPath).catch(() => null);
+    if (!buf) {
+      voiceEngine.anchorPath = anchorPath;
+      if (!opts.quiet) log(`  · 还没有音色锚点，第一句将存成 ${path.relative(process.cwd(), anchorPath)}`);
+    } else {
+      // 只喂旁白，不喂角色——每个角色各锚各的，否则三个人会变成一个声音
+      voiceEngine.volcRefs.set('__narrator__', buf.toString('base64'));
+      if (!opts.quiet) log(`  · 音色锚点：${path.relative(process.cwd(), anchorPath)}`);
     }
   }
 
