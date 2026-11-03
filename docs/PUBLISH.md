@@ -44,33 +44,40 @@ https://awesome-dsh-plugin.com/plugins.json      # 截至今天 8489 条
   这样 `github:用户名/仓库` 装下来就是「引擎 + 插件」一整套，插件靠「上一级就是引擎根」自己找到引擎，不需要配置。
 - 包名 `tuwen-studio` 在 npm 上**还没人占用**（查过了）。
 - 注意：npm 上已经有一个 `dsh-video-studio`（作者 litao，0.4.3），做的是「把素材目录剪成片」，和这个不冲突但名字容易混。
-- 这台机器上**还没有 git remote**，所以什么都还没发布。
+- GitHub 账号 `Yannick-Mo`；`git remote origin` 已设为 **SSH**：`git@github.com:Yannick-Mo/tuwen-studio.git`。
+- **SSH 认证已验证可用**（`Hi Yannick-Mo! You've successfully authenticated`），推代码不需要密码。
+- 但 `Yannick-Mo/tuwen-studio` 这个**仓库还不存在**，而建仓库需要网页或 API token，命令行建不了。
+- 图标已生成：`assets/icon.png`（256×256 PNG）。
+- 当前分支是 `master`，建议改成 `main` 再推。
 
 ---
 
 ## 步骤
 
-### 1. 推到 GitHub
+### 1. 先建空仓库（网页一次点击）
+
+打开：
+
+```
+https://github.com/new?name=tuwen-studio&visibility=public
+```
+
+只要填名字、选 Public，**不要**勾 "Add a README"、**.gitignore** 或 **license**——空仓库，否则推送会冲突。
+
+建好后本地推送：
 
 ```powershell
 cd D:\YannickFile\TuWenShiPin
-git remote add origin https://github.com/<你的用户名>/tuwen-studio.git
 git branch -M main
 git push -u origin main
 ```
 
-仓库名建议就叫 `tuwen-studio`，和包名一致，读者不容易搞混。
-
-推上去之后，在 `package.json` 里补一行（可选但推荐，npm 和索引都会读）：
-
-```json
-"repository": { "type": "git", "url": "git+https://github.com/<你的用户名>/tuwen-studio.git" },
-```
+因为 remote 用的是 SSH，这一步不会再问密码。
 
 ### 2. 自己先装一遍，确认别人也装得上
 
 ```powershell
-dsh plugin --profile web add github:<你的用户名>/tuwen-studio
+dsh plugin --profile web add github:Yannick-Mo/tuwen-studio
 ```
 
 装完重开会话，看到 6 个 `video_studio_*` 工具就算成功。
@@ -84,11 +91,14 @@ dsh plugin --profile web add github:<你的用户名>/tuwen-studio
 dsh plugin --profile web remove tuwen-studio
 ```
 
-### 3. 准备一张图标
+### 3. 图标（已就绪）
 
-市场条目里 `icon` 是必填的观感项：256×256 PNG，放到仓库里（例如 `assets/icon.png`），
-推上去之后用 `https://raw.githubusercontent.com/<用户名>/tuwen-studio/main/assets/icon.png`
-这样的地址，收录时会用。
+`assets/icon.png` 已生成（256×256，从 `plugin-video-studio/icon.svg` 渲染）。
+推上去之后地址是：
+
+```
+https://raw.githubusercontent.com/Yannick-Mo/tuwen-studio/main/assets/icon.png
+```
 
 ### 4. 提交收录
 
@@ -96,7 +106,7 @@ dsh plugin --profile web remove tuwen-studio
 
 ```yaml
 name: 图文视频工坊 · tuwen-studio
-repo: https://github.com/<你的用户名>/tuwen-studio
+repo: https://github.com/Yannick-Mo/tuwen-studio
 category: video            # 按他们的分类表选
 description:
   en: >-
@@ -108,7 +118,7 @@ description:
     把一个剧本变成有配音、有字幕、有运镜的竖屏视频：AI 出图（方舟 Seedream）、
     真配音带词级时间戳、卡拉OK/漫画字幕、单镜重渲、自动质检。
     ffmpeg 和 Chromium 随包安装，不需要 Python，不用配 PATH。
-icon: https://raw.githubusercontent.com/<你的用户名>/tuwen-studio/main/assets/icon.png
+icon: https://raw.githubusercontent.com/Yannick-Mo/tuwen-studio/main/assets/icon.png
 ```
 
 其余字段（星数、下载量、能力扫描、`install` 命令）由索引方自动生成。
