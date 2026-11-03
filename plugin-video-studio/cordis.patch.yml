@@ -1,7 +1,10 @@
 # 图文视频工坊：把剧本描述渲染成带配音/字幕/运镜的 mp4
+#
+# 开发模式专用：这个包用 Junction 挂在 profile 里，name 走 @local 命名空间。
+# 正式安装（github: 或 npm）走仓库根目录的 cordis.patch.yml，name 是 tuwen-studio。
+# 这里不写 engineDir：插件会从自己所在的位置往上找到引擎根（上一级就是）。
 - insert:
     - id: video-studio
       name: '@local/dsh-video-studio'
       config:
-        engineDir: 'D:\YannickFile\TuWenShiPin'
         jobs: 4

@@ -1,0 +1,9 @@
+# 图文视频工坊：把剧本描述渲染成带配音/字幕/运镜的 mp4
+#
+# name 必须等于 npm 包名：DSH 按这个名字 import 本包，拿它的 apply()。
+# 不要在这里写死 engineDir —— 插件会从自己所在的位置往上找到引擎根。
+- insert:
+    - id: video-studio
+      name: 'tuwen-studio'
+      config:
+        jobs: 4

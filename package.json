@@ -1,21 +1,42 @@
 {
   "name": "tuwen-studio",
   "version": "0.2.0",
-  "description": "图文视频工坊：一句主题 → 配音、画面、动效、字幕、成片",
+  "description": "图文视频工坊：一句主题 → 配音、画面、动效、字幕、成片。既是 DSH 插件，也自带 CLI 和渲染引擎。",
   "license": "MIT",
   "type": "module",
   "private": false,
   "bin": {
     "tuwen": "./src/cli.js"
   },
+  "main": "./index.js",
   "exports": {
-    ".": "./src/cli.js",
+    ".": "./index.js",
+    "./plugin": "./plugin-video-studio/index.js",
     "./package.json": "./package.json"
   },
   "engines": {
     "node": ">=20.11"
   },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "video",
+    "text-to-video",
+    "tts",
+    "subtitles",
+    "ffmpeg",
+    "playwright"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "icon": "./plugin-video-studio/icon.svg",
   "files": [
+    "index.js",
+    "cordis.patch.yml",
+    "plugin-video-studio/",
     "src/",
     "stage/",
     "studio/",
