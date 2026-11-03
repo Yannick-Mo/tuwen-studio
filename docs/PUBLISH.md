@@ -40,56 +40,34 @@ https://awesome-dsh-plugin.com/plugins.json      # 截至今天 8489 条
 
 ## 现在的状态
 
-- 仓库已经改造成**单包形态**：仓库根目录就是 bundle（`index.js` + `cordis.patch.yml` + `dsh.bundle.patch`）。
-  这样 `github:用户名/仓库` 装下来就是「引擎 + 插件」一整套，插件靠「上一级就是引擎根」自己找到引擎，不需要配置。
-- 包名 `tuwen-studio` 在 npm 上**还没人占用**（查过了）。
-- 注意：npm 上已经有一个 `dsh-video-studio`（作者 litao，0.4.3），做的是「把素材目录剪成片」，和这个不冲突但名字容易混。
-- GitHub 账号 `Yannick-Mo`；`git remote origin` 已设为 **SSH**：`git@github.com:Yannick-Mo/tuwen-studio.git`。
-- **SSH 认证已验证可用**（`Hi Yannick-Mo! You've successfully authenticated`），推代码不需要密码。
-- 但 `Yannick-Mo/tuwen-studio` 这个**仓库还不存在**，而建仓库需要网页或 API token，命令行建不了。
-- 图标已生成：`assets/icon.png`（256×256 PNG）。
-- 当前分支是 `master`，建议改成 `main` 再推。
+已经发布，可以直接用：
+
+| 项 | 值 |
+|---|---|
+| 仓库 | https://github.com/Yannick-Mo/tuwen-studio （public，`main`） |
+| 协议 | Apache-2.0（建仓库时选的） |
+| 安装 | `dsh plugin --profile <名字> add github:Yannick-Mo/tuwen-studio` |
+| 图标 | `assets/icon.png`，256×256，从 `plugin-video-studio/icon.svg` 渲染 |
+| 已验证 | `npm i github:Yannick-Mo/tuwen-studio` → 装完能作为插件加载，注册 6 个 `video_studio_*` 工具 |
+| 还差 | 仓库描述和 topics 是空的；市场收录还没提交 |
+
+npm 上 `tuwen-studio` 这个包名**还没人占用**；另外已经有一个 `dsh-video-studio`（作者 litao，0.4.3），
+做的是「把素材目录剪成片」，和这个不冲突但名字容易混，描述里要把「AI 出图 + 真配音」说清楚。
 
 ---
 
-## 步骤
+## 已经做完的步骤
 
-### 1. 先建空仓库（网页一次点击）
+### 1. 推到 GitHub ✅
 
-打开：
+remote 用 SSH：`git@github.com:Yannick-Mo/tuwen-studio.git`（`~/.ssh/config` 里已经把 github 走 443 端口）。
 
-```
-https://github.com/new?name=tuwen-studio&visibility=public
-```
+### 2. 验证别人装得上 ✅
 
-只要填名字、选 Public，**不要**勾 "Add a README"、**.gitignore** 或 **license**——空仓库，否则推送会冲突。
+同一条路走过两遍：打包成 tgz 装一次、直接从 GitHub 装一次，两次装完都能加载出 6 个工具。
 
-建好后本地推送：
-
-```powershell
-cd D:\YannickFile\TuWenShiPin
-git branch -M main
-git push -u origin main
-```
-
-因为 remote 用的是 SSH，这一步不会再问密码。
-
-### 2. 自己先装一遍，确认别人也装得上
-
-```powershell
-dsh plugin --profile web add github:Yannick-Mo/tuwen-studio
-```
-
-装完重开会话，看到 6 个 `video_studio_*` 工具就算成功。
-
-> **这一步别跳。** `github:` 安装会跑 `postinstall` 下载 Chromium，走的是和本机不一样的环境；
-> 别人的机器上没有你已经下好的浏览器和 ffmpeg，这里能通才说明分发包真的完整。
-
-装错了就卸掉重来：
-
-```powershell
-dsh plugin --profile web remove tuwen-studio
-```
+> **再验证时别在正在用的 profile 上装第二份**——会重复注册同名工具。
+> 要试就开一个临时 profile：`dsh plugin --profile tmp-check add github:Yannick-Mo/tuwen-studio`。
 
 ### 3. 图标（已就绪）
 
