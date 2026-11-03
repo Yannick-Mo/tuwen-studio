@@ -138,10 +138,6 @@ export function wavFromPcm(pcm, { rate = 48000, channels = 2 } = {}) {
   return Buffer.concat([header, pcm]);
 }
 
-export function silencePcm(seconds, { rate = 48000, channels = 2 } = {}) {
-  return Buffer.alloc(Math.max(0, Math.round(seconds * rate)) * channels * 2);
-}
-
 export const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 export function log(msg) {

@@ -77,13 +77,3 @@ export async function synthesizeEdge({
     try { tts.close(); } catch { /* 已经关了就算了 */ }
   }
 }
-
-/** 能不能用：模块装上了就算能用（真正的网络问题在合成时才暴露） */
-export async function edgeJSAvailable() {
-  try {
-    const { MsEdgeTTS: K } = await import('msedge-tts');
-    return typeof K === 'function';
-  } catch {
-    return false;
-  }
-}

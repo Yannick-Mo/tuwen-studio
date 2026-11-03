@@ -100,10 +100,6 @@ export async function encodeParallel(pages, ranges, fps, outDir, onProgress, opt
   return work.map((r) => segFile(r.index));
 }
 
-export async function encodeRanges(page, ranges, fps, outDir, onProgress) {
-  return encodeParallel([page], ranges, fps, outDir, onProgress);
-}
-
 /** 只编一段（改一镜时用） */
 export async function encodeRange(page, range, fps, outFile, onFrame, opts = {}) {
   const count = range.toFrame - range.fromFrame;
@@ -259,16 +255,5 @@ export async function mux(video, audio, out) {
     '-c:v', 'copy', '-c:a', 'copy',
     '-shortest', '-movflags', '+faststart', out,
   ]);
-  return out;
-}
-
-/** 生成一条低调的环境底噪（没有 BGM 素材时占位，避免干声） */
-export async function synthBgm(out, seconds, { root = 110 } = {}) {
-  const notes = [1, 1.5, 2.0, 2.66];
-  const inputs = notes.flatMap((m) => ['-f', 'lavfi', '-i', `sine=f=${(root * m).toFixed(2)}:r=48000:d=${seconds.toFixed(2)}`]);
-  const parts = notes.map((_, i) => `[${i}:a]volume=${(0.22 / (i + 1)).toFixed(3)}[v${i}]`);
-  const mix = notes.map((_, i) => `[v${i}]`).join('') + `amix=inputs=${notes.length}:normalize=0,lowpass=f=900,` +
-    `tremolo=f=0.12:d=0.35,aecho=0.8:0.88:1200|1800:0.22|0.12[bg]`;
-  await ffmpeg(['-y', ...inputs, '-filter_complex', [...parts, mix].join(';'), '-map', '[bg]', '-c:a', 'pcm_s16le', out]);
   return out;
 }

@@ -54,7 +54,6 @@
     "specs/",
     "test/",
     "assets/",
-    "DESIGN.md",
     ".env.example"
   ],
   "scripts": {
