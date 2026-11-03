@@ -4,10 +4,13 @@ import { createRequire } from 'node:module';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+import { PROJECTS_DIR } from '../src/util.js';
 
 export const name = 'video-studio';
 export const inject = ['tools'];
 
+// 插件和引擎总是住在一起：这个路径既是「我旁边那个引擎」，也是引擎自己认的根
+const SIBLING_ENGINE = path.resolve(import.meta.dirname, '..');
 const requireFromPlugin = createRequire(import.meta.url);
 
 /** 一个目录像不像引擎：得有入口和清单，光有名字不算 */
@@ -143,10 +146,9 @@ const OUT_SCHEMA = {
 
 export function apply(ctx, config = {}) {
   const engineDir = resolveEngine(config);
-  // 项目目录：跟着环境变量走，和引擎里的 PROJECTS_DIR 用同一条规则
-  const projectsDir = process.env.TUWEN_PROJECTS
-    ? path.resolve(process.env.TUWEN_PROJECTS)
-    : path.join(engineDir, 'projects');
+  // 项目目录和引擎用同一套规则（装进 node_modules 时会落在 ~/.dsh/tuwen，不会写进包目录）。
+  // 只有当 config 把引擎指到别处时才退回「引擎旁边的 projects」。
+  const projectsDir = engineDir === SIBLING_ENGINE ? PROJECTS_DIR : path.join(engineDir, 'projects');
   const jobs = Number(config.jobs) || 4;
   const timeoutMs = Number(config.timeoutMs) || 20 * 60 * 1000;
 

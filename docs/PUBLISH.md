@@ -63,10 +63,23 @@ remote 用 SSH：`git@github.com:Yannick-Mo/tuwen-studio.git`（`~/.ssh/config` 
 
 ### 2. 验证别人装得上 ✅
 
-同一条路走过两遍：打包成 tgz 装一次、直接从 GitHub 装一次，两次装完都能加载出 6 个工具。
+在一个全新的临时 profile 里实装过一遍（`dsh plugin --profile tmp-check add …`），结论：
 
-> **再验证时别在正在用的 profile 上装第二份**——会重复注册同名工具。
-> 要试就开一个临时 profile：`dsh plugin --profile tmp-check add github:Yannick-Mo/tuwen-studio`。
+| 步骤 | 结果 |
+|---|---|
+| 第一次 `add` | 27 秒装完 54 个包，但以 `ERR_PNPM_IGNORED_BUILDS` 退出 —— pnpm 拦下了 `ffmpeg-static`、`msedge-tts`、`tuwen-studio` 三个安装脚本 |
+| 打开 profile 的 `pnpm-workspace.yaml`，把 `allowBuilds:` 下三行的 `set this to true or false` 改成 `true` | dsh 已经把待批准项自动写好了，只差填值 |
+| 第二次 `add` | 2 分 57 秒，`ffmpeg-static install` 跑通，`tuwen-studio postinstall` 报告「Chromium 已就绪」。退出码 0 |
+| 装完跑 `doctor` | 七项全绿（除了可选的 API Key） |
+
+**注意**：`allowBuilds` 里 `tuwen-studio` 的键带着 commit SHA
+（`tuwen-studio@https://codeload.github.com/…/tar.gz/<sha>`），每次升级都会变，
+所以**升级后要重新批准一次**。这是 pnpm 的机制，不是配置漏了。
+
+### 3. 数据不写进 node_modules ✅
+
+装成包之后，`projects/` 和 `cache/` 落在 `~/.dsh/tuwen/`，不会跟着包目录被升级清空。
+仓库里跑（`node src/cli.js`）时仍然是仓库下的 `projects/`，两种模式都实测过。
 
 ### 3. 图标（已就绪）
 

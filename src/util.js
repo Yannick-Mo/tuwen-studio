@@ -9,17 +9,29 @@ import { spawn } from 'node:child_process';
 // ── 位置：一律从「这个文件在哪」算，不从「你在哪个目录」算 ──────────
 // 以前整套路径都基于 process.cwd()，导致换个目录跑 `tuwen list` 会静默返回空数组。
 export const ROOT = path.resolve(import.meta.dirname, '..');
-export const CACHE_ROOT = process.env.TUWEN_CACHE
-  ? path.resolve(process.env.TUWEN_CACHE)
-  : path.join(ROOT, '.cache');
-export const PROJECTS_DIR = process.env.TUWEN_PROJECTS
-  ? path.resolve(process.env.TUWEN_PROJECTS)
-  : path.join(ROOT, 'projects');
 export const CONFIG_DIR = process.env.TUWEN_HOME
   ? path.resolve(process.env.TUWEN_HOME)
   : path.join(os.homedir(), '.dsh', 'tuwen');
 export const USER_ENV_FILE = path.join(CONFIG_DIR, '.env');
 export const REPO_ENV_FILE = path.join(ROOT, '.env');
+
+/**
+ * 这个引擎是被当成依赖装进 node_modules 的，还是一个仓库？
+ *
+ * 分清楚很重要：装进 node_modules 时，项目和缓存不能写在包目录里——
+ * 那是 npm/pnpm 的地盘，升级一次就被清空了，用户的片子会凭空消失。
+ */
+export const INSTALLED_AS_PACKAGE = ROOT.split(path.sep).includes('node_modules');
+
+/** 仓库存放数据用 ROOT，装成包时用 ~/.dsh/tuwen */
+const dataHome = INSTALLED_AS_PACKAGE ? CONFIG_DIR : ROOT;
+
+export const CACHE_ROOT = process.env.TUWEN_CACHE
+  ? path.resolve(process.env.TUWEN_CACHE)
+  : path.join(dataHome, INSTALLED_AS_PACKAGE ? 'cache' : '.cache');
+export const PROJECTS_DIR = process.env.TUWEN_PROJECTS
+  ? path.resolve(process.env.TUWEN_PROJECTS)
+  : path.join(dataHome, 'projects');
 
 const require = createRequire(import.meta.url);
 const safeRequire = (m) => { try { return require(m); } catch { return null; } };

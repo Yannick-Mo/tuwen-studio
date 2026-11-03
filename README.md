@@ -51,8 +51,36 @@ node src/cli.js demo
 | 配音引擎 | `npm install`（msedge-tts，纯 Node） | 不需要 Python，也不用 `pip install` |
 | API Key | `tuwen setup` 页面里填 | 不填也能出片，但画面是占位图，不算成品 |
 
-**发给别人时**：`npm pack` 会打出一个约 165KB 的 tgz，除依赖外什么都带齐（`docs/`、`specs/`、`test/`、图标）。
-对方 `npm i <tgz>` 之后跑 `tuwen doctor` 就够了。插件单独装：`node scripts/install-plugin.mjs`。
+### 别人怎么装
+
+**装进 DSH（推荐）**：一条命令，引擎和插件一起下来。
+
+```powershell
+dsh plugin --profile web add github:Yannick-Mo/tuwen-studio
+```
+
+**会报一次错，这是正常的**：pnpm 默认不允许依赖跑安装脚本，所以第一次会以
+`ERR_PNPM_IGNORED_BUILDS` 结束，并列出三个包（`ffmpeg-static`、`msedge-tts`、`tuwen-studio`）。
+打开 profile 目录下的 `pnpm-workspace.yaml`，把 `allowBuilds:` 里那几行的
+`set this to true or false` 改成 `true`，再跑一次同样的命令。第二次大约 3 分钟，
+会真的去下 ffmpeg 的二进制。
+
+> 那个 YAML 里 `tuwen-studio` 的键带着 commit SHA，所以**升级后要重新批准一次**——
+> 这是 pnpm 的设计，不是我漏配了什么。
+
+装完重开 DSH 会话，出现六个 `video_studio_*` 工具即可。第一次用之前跑一次自检：
+
+```powershell
+node <profile>/node_modules/tuwen-studio/src/cli.js doctor
+```
+
+装成包之后，项目和数据都放在 `~/.dsh/tuwen/`（`projects/` 和 `cache/`），
+**不会写进 `node_modules`**——升级时不会被清掉。你自己的 key 也在那儿（`tuwen setup`）。
+
+**当成 CLI 用**：`npm i -g github:Yannick-Mo/tuwen-studio`，然后 `tuwen doctor`。
+
+**就地打包**：`npm pack` 会打出一个约 165KB 的 tgz，除依赖外什么都带齐（`docs/`、`specs/`、`test/`、图标）。
+对方 `npm i <tgz>` 之后跑 `tuwen doctor` 就够了。
 
 要发到 DSH 插件市场，看 [docs/PUBLISH.md](docs/PUBLISH.md)——机制、要改成什么样、要提什么 PR，都写在那里面。
 
