@@ -29,6 +29,19 @@ node src/cli.js doctor          # 逐项检查 node/ffmpeg/ffprobe/Chromium/配�
 
 ---
 
+## 工具报错怎么看
+
+工具失败时返回里一定有 `error`（发生了什么）和 `hint`（下一步做什么）。**照着 hint 做，不要原样重试一次。**
+
+| 返回里的 `kind` | 意思 | 你该做什么 |
+|---|---|---|
+| `bad-args` | 你传的参数不对：缺了、类型错、格式不符 | 消息里写了期望什么，改参数重试 |
+| `internal` | 插件自己出 bug 了 | 把 error 和 hint 里的日志路径一起转告用户，别自己猜 |
+
+引擎跑挂了（`ok:false` 但没有 `kind`）通常是环境或输入的问题：先跑 `doctor` 看环境，再看 `error` 里的 stderr 尾巴。
+
+---
+
 ## 选型速查
 
 | 内容类型 | `style.preset` | 配音 |

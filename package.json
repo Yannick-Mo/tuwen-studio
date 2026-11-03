@@ -62,7 +62,7 @@
     "doctor": "node src/cli.js doctor",
     "demo": "node src/cli.js demo",
     "render": "node src/cli.js render",
-    "test": "node test/smoke.mjs && node test/gate.mjs",
+    "test": "node test/smoke.mjs && node test/gate.mjs && node test/tools.mjs",
     "test:real": "node test/smoke.mjs --real"
   },
   "dependencies": {

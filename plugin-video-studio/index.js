@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { existsSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { PROJECTS_DIR } from '../src/util.js';
@@ -56,6 +57,122 @@ function resolveEngine(config) {
     ...tried.map((p) => `  - ${p}`),
     '指定方式：设环境变量 TUWEN_ENGINE=<引擎目录>，或在插件配置里给 engineDir。',
   ].join('\n'));
+}
+
+// ── 参数与错误：把「裸 TypeError」变成模型能照着改的一句话 ──────────
+// 实测过：DSH 不会替我们校验参数类型（少传 required 参数也照样进 execute），
+// 所以每个工具必须自己挡住，否则模型会收到 `(args.times || []).filter is not a function`
+// 这种东西——它既看不出哪里错，也不知道下一步该怎么办。
+
+class ArgError extends Error {
+  constructor(message, hint = '') {
+    super(message);
+    this.name = 'ArgError';
+    this.hint = hint;
+  }
+}
+
+const ID_RE = /^[a-z0-9][a-z0-9_-]{0,40}$/;
+const SCENE_RE = /^[A-Za-z0-9_-]{1,20}$/;
+
+function typeName(v) {
+  if (Array.isArray(v)) return '数组';
+  if (v === null) return 'null';
+  return { string: '字符串', number: '数字', boolean: '布尔值', object: '对象', undefined: '空' }[typeof v] || typeof v;
+}
+
+/** 取一个字符串参数；缺了、类型不对、格式不对，都给出能照着改的提示 */
+function argString(args, key, { required = true, re = null, pattern = '', example = '', maxLen = 4000 } = {}) {
+  const raw = args?.[key];
+  if (raw == null || raw === '') {
+    if (!required) return '';
+    throw new ArgError(`缺少参数 ${key}`, example ? `要给一个字符串，例如 ${key}="${example}"` : `${key} 必须有值`);
+  }
+  if (typeof raw !== 'string') {
+    throw new ArgError(
+      `参数 ${key} 应该是字符串，收到的是${typeName(raw)}`,
+      example ? `例如 ${key}="${example}"` : '',
+    );
+  }
+  const v = raw.trim();
+  if (!v) {
+    if (!required) return '';
+    throw new ArgError(`参数 ${key} 是空字符串`, example ? `要给一个字符串，例如 ${key}="${example}"` : '');
+  }
+  if (v.length > maxLen) throw new ArgError(`参数 ${key} 太长（${v.length} 字，上限 ${maxLen}）`, '');
+  if (re && !re.test(v)) {
+    throw new ArgError(`参数 ${key} 格式不对：「${v}」`, `${pattern}${example ? `，例如 ${example}` : ''}`);
+  }
+  return v;
+}
+
+/** 取一个数字数组参数（取帧时间点用） */
+function argNumberArray(args, key, { required = true, min = 0, max = 1e5, maxItems = 12, example = '' } = {}) {
+  const raw = args?.[key];
+  if (raw == null) {
+    if (!required) return [];
+    throw new ArgError(`缺少参数 ${key}`, `要给一个数字数组，例如 ${key}=${example || '[1, 3.5, 6]'}`);
+  }
+  if (!Array.isArray(raw)) {
+    throw new ArgError(
+      `参数 ${key} 应该是数字数组，收到的是${typeName(raw)}`,
+      `要写 ${key}=${example || '[1, 3.5, 6]'}，不是 ${JSON.stringify(raw)}`,
+    );
+  }
+  if (raw.length === 0) throw new ArgError(`参数 ${key} 是空数组`, `至少给一个时间点，例如 ${key}=[1, 3.5]`);
+  if (raw.length > maxItems) throw new ArgError(`参数 ${key} 最多 ${maxItems} 个时间点，收到 ${raw.length} 个`, '');
+  const bad = raw.findIndex((n) => typeof n !== 'number' || !Number.isFinite(n) || n < min || n > max);
+  if (bad >= 0) {
+    throw new ArgError(
+      `参数 ${key} 第 ${bad + 1} 项不是合法数字：${JSON.stringify(raw[bad])}`,
+      `要求 ${min}~${max} 秒之间的数字`,
+    );
+  }
+  return raw;
+}
+
+/** 把一次执行包起来：参数错误给可执行提示，真出 bug 也不会把裸栈丢给模型 */
+function guard(fn) {
+  return async (args = {}) => {
+    try {
+      return await fn(args || {});
+    } catch (e) {
+      if (e instanceof ArgError) {
+        return { ok: false, kind: 'bad-args', error: e.message, hint: e.hint || '' };
+      }
+      const logFile = await dumpErrorLog(e, args).catch(() => null);
+      return {
+        ok: false,
+        kind: 'internal',
+        error: `插件内部错误：${String(e?.message || e).slice(0, 300)}`,
+        hint: logFile
+          ? `这不是你参数写错了。把这句话和日志一起转告用户：${logFile}`
+          : '这是插件本身的 bug，不是你参数写错了。',
+      };
+    }
+  };
+}
+
+/** 内部错误落盘：模型只看一句摘要，排查时要全栈 */
+async function dumpErrorLog(err, args) {
+  const dir = path.join(os.homedir(), '.dsh', 'tuwen', 'logs');
+  await fs.mkdir(dir, { recursive: true });
+  const f = path.join(dir, `plugin-error-${new Date().toISOString().replace(/[:.]/g, '-')}.log`);
+  const body = [
+    new Date().toISOString(),
+    '',
+    String(err?.stack || err),
+    '',
+    '--- args ---',
+    (() => { try { return JSON.stringify(args, null, 2); } catch { return '(无法序列化)'; } })(),
+  ].join('\n');
+  await fs.writeFile(f, body, 'utf8');
+  return f;
+}
+
+/** 失败信息统一长相：一句发生了什么，一句下一步怎么办 */
+function failText(label, v) {
+  return [label, v?.error || '未知错误', v?.hint ? `→ ${v.hint}` : ''].filter(Boolean).join('\n');
 }
 
 // 「这个 spec 的分镜表给人看过没有」的记账本。
@@ -125,11 +242,17 @@ function runCli(engineDir, args, { timeoutMs, projectsDir }) {
   });
 }
 
+/**
+ * 从 CLI 的 stdout 里捞出最后一段 JSON。
+ * 同时认 { 和 [ —— `tuwen list` 输出的是数组，只认 { 的话
+ * video_studio_list 会永远返回空数组（这个 bug 被 test/tools.mjs 抓出来过）。
+ */
 function lastJson(text) {
   const lines = String(text).trim().split('\n');
   for (let i = lines.length - 1; i >= 0; i--) {
-    if (!lines[i].trim().startsWith('{')) continue;
-    try { return JSON.parse(lines.slice(i).join('\n')); } catch { /* try earlier */ }
+    const first = lines[i].trim()[0];
+    if (first !== '{' && first !== '[') continue;
+    try { return JSON.parse(lines.slice(i).join('\n')); } catch { /* 往前找 */ }
   }
   return null;
 }
@@ -293,16 +416,27 @@ export function apply(ctx, config = {}) {
       }],
     },
     timeoutMs,
-    async execute(args) {
-      const given = args.spec && typeof args.spec === 'object' ? args.spec : null;
-      const hasSpec = given && Object.keys(given).length > 0;
-      const spec = { ...(hasSpec ? given : {}) };
-      const id = String(args.projectId || spec.id || '').trim();
-      if (!/^[a-z0-9][a-z0-9_-]{0,40}$/.test(id)) {
-        throw new Error('project id 必须是 1~41 位小写字母/数字/短横线，例如 "deepsea"');
+    execute: guard(async (args) => {
+      if (args.spec != null && (typeof args.spec !== 'object' || Array.isArray(args.spec))) {
+        throw new ArgError(
+          `参数 spec 应该是一个对象，收到的是${typeName(args.spec)}`,
+          '例如 spec={ "title": "黑洞是什么", "scenes": [{ "narration": "宇宙里最神秘的天体是黑洞。" }] }',
+        );
       }
+      const given = args.spec && typeof args.spec === 'object' && Object.keys(args.spec).length ? args.spec : null;
+      const hasSpec = Boolean(given);
+      const spec = { ...(given || {}) };
+      const id = argString({ projectId: args.projectId ?? spec.id }, 'projectId', {
+        re: ID_RE, pattern: '1~41 位小写字母/数字/短横线', example: 'deepsea',
+      });
       if (hasSpec && (!Array.isArray(spec.scenes) || spec.scenes.length === 0)) {
-        throw new Error('spec.scenes 不能为空：每个镜头一条旁白');
+        throw new ArgError('spec.scenes 不能为空', '每个镜头一条旁白：scenes: [{ narration: "…" }, …]');
+      }
+      if (args.jobs != null) {
+        const n = Number(args.jobs);
+        if (!Number.isInteger(n) || n < 1 || n > 16) {
+          throw new ArgError(`参数 jobs 应该是 1~16 的整数，收到的是 ${JSON.stringify(args.jobs)}`, '一般不用传，默认 4');
+        }
       }
       spec.id = id;
 
@@ -351,9 +485,9 @@ export function apply(ctx, config = {}) {
         if (!result) throw new Error('引擎没有返回结果 JSON');
         return result;
       } catch (e) {
-        return { ok: false, error: String(e.message).slice(0, 2000) };
+        return { ok: false, error: String(e.message).slice(0, 2000), hint: '渲染失败了。先跑 node <引擎>/src/cli.js doctor 看环境，再重试。' };
       }
-    },
+    }),
   }));
 
   // ---------------------------------------------------------------- guide
@@ -376,16 +510,16 @@ export function apply(ctx, config = {}) {
       },
       render: (_a, v) => [{ type: 'text', text: v.ok ? v.guide : `手册读取失败：${v.error}` }],
     },
-    async execute() {
+    execute: guard(async () => {
       try {
         // 手册跟着引擎走：你装的是哪个版本的引擎，就该读哪个版本的手册
         const p = path.join(engineDir, 'docs', 'PLAYBOOK.md');
         const guide = await fs.readFile(p, 'utf8');
         return { ok: true, guide };
       } catch (e) {
-        return { ok: false, error: String(e.message).slice(0, 300) };
+        return { ok: false, error: String(e.message).slice(0, 300), hint: '引擎目录里缺 docs/PLAYBOOK.md，重新安装一次插件。' };
       }
-    },
+    }),
   }));
 
   // -------------------------------------------------------------- review
@@ -418,12 +552,11 @@ export function apply(ctx, config = {}) {
             `${v.projectId} · ${v.duration}s · ${v.shots.length} 镜`,
             ...v.shots.map((s) => `${s.index + 1}. ${s.id} ${s.duration}s  ${s.narration}${s.speaker ? `  🗣${s.speaker}` : ''}\n   image: ${s.image || '缺失'}\n   voice: ${s.voice || '缺失'}`),
           ].join('\n')
-          : `审片清单读取失败：${v.error}`,
+          : failText('审片清单读取失败：', v),
       }],
     },
-    async execute(args) {
-      const id = String(args.projectId || '').trim();
-      if (!id) throw new Error('要指定 projectId');
+    execute: guard(async (args) => {
+      const id = argString(args, 'projectId', { re: ID_RE, pattern: '1~41 位小写字母/数字/短横线', example: 'blackhole' });
       try {
         const dir = path.join(projectsDir, id);
         const project = JSON.parse(await fs.readFile(path.join(dir, 'project.json'), 'utf8'));
@@ -457,9 +590,9 @@ export function apply(ctx, config = {}) {
           shots,
         };
       } catch (e) {
-        return { ok: false, error: String(e.message).slice(0, 300) };
+        return { ok: false, error: String(e.message).slice(0, 300), hint: '先用 video_studio_list 确认项目名是否正确。' };
       }
-    },
+    }),
   }));
 
   // --------------------------------------------------------------- scene
@@ -498,26 +631,31 @@ export function apply(ctx, config = {}) {
             `出图：${v.image ? `${v.image.mode}${v.image.cached ? '（命中缓存）' : ''}` : '沿用原图'}`,
             `质检：${(v.qc?.checks || []).map((c) => `${c.ok ? '✓' : '✗'}${c.name}`).join(' ')}`,
           ].join('\n')
-          : `重渲失败：${v.error || '未知错误'}`,
+          : failText('重渲失败：', v),
       }],
     },
     timeoutMs: 10 * 60 * 1000,
-    async execute(args) {
-      const id = String(args.projectId || '').trim();
-      const sceneId = String(args.sceneId || '').trim();
-      if (!/^[a-z0-9][a-z0-9_-]{0,40}$/.test(id)) throw new Error('非法 projectId');
-      if (!/^[A-Za-z0-9_-]{1,20}$/.test(sceneId)) throw new Error('非法 sceneId');
+    execute: guard(async (args) => {
+      const id = argString(args, 'projectId', { re: ID_RE, pattern: '1~41 位小写字母/数字/短横线', example: 'blackhole' });
+      const sceneId = argString(args, 'sceneId', { re: SCENE_RE, pattern: '镜头 id，1~20 位字母数字下划线短横线', example: 's3' });
+      const prompt = argString(args, 'prompt', { required: false, maxLen: 2000 });
+      if (args.seed != null) {
+        const n = Number(args.seed);
+        if (!Number.isInteger(n) || n < 0) {
+          throw new ArgError(`参数 seed 应该是非负整数，收到的是 ${JSON.stringify(args.seed)}`, '例如 seed=12345；不传就用默认种子');
+        }
+      }
       const cli = ['scene', path.join(projectsDir, id, 'project.json'), `--id=${sceneId}`];
-      if (args.prompt) cli.push(`--prompt=${args.prompt}`);
+      if (prompt) cli.push(`--prompt=${prompt}`);
       if (args.seed != null) cli.push(`--seed=${args.seed}`);
       if (args.noImage) cli.push('--no-image');
       try {
         const { out } = await runCli(engineDir, cli, { timeoutMs: 10 * 60 * 1000, projectsDir });
-        return lastJson(out) || { ok: false, error: '引擎没有返回结果' };
+        return lastJson(out) || { ok: false, error: '引擎没有返回结果', hint: '先用 video_studio_list 确认这条片子已经完整 build 过一次。' };
       } catch (e) {
-        return { ok: false, error: String(e.message).slice(0, 1500) };
+        return { ok: false, error: String(e.message).slice(0, 1500), hint: '单镜重渲要在这条片子已经 build 过、且分段文件还在的前提下才能用。' };
       }
-    },
+    }),
   }));
 
   // --------------------------------------------------------------- frames
@@ -550,22 +688,20 @@ export function apply(ctx, config = {}) {
         type: 'text',
         text: v.ok
           ? (v.frames || []).map((f) => `${f.t}s → ${f.file}`).join('\n')
-          : `取帧失败：${v.error}`,
+          : failText('取帧失败：', v),
       }],
     },
     timeoutMs: 5 * 60 * 1000,
-    async execute(args) {
-      const id = String(args.projectId || '').trim();
-      if (!/^[a-z0-9][a-z0-9_-]{0,40}$/.test(id)) throw new Error('非法 projectId');
-      const times = (args.times || []).filter((n) => Number.isFinite(n) && n >= 0).slice(0, 12);
-      if (!times.length) throw new Error('times 不能为空');
+    execute: guard(async (args) => {
+      const id = argString(args, 'projectId', { re: ID_RE, pattern: '1~41 位小写字母/数字/短横线', example: 'blackhole' });
+      const times = argNumberArray(args, 'times', { max: 100000, maxItems: 12, example: '[1, 3.5, 6]' });
       try {
         const { out } = await runCli(engineDir, ['frames', path.join(projectsDir, id, 'project.json'), `--times=${times.join(',')}`], { timeoutMs: 5 * 60 * 1000, projectsDir });
-        return lastJson(out) || { ok: false, error: '没有取到帧' };
+        return lastJson(out) || { ok: false, error: '没有取到帧', hint: '先用 video_studio_list 确认项目名，再确认这条片子已经渲染过。' };
       } catch (e) {
-        return { ok: false, error: String(e.message).slice(0, 1200) };
+        return { ok: false, error: String(e.message).slice(0, 1200), hint: '取帧失败多半是项目没渲过或没有 project.json。' };
       }
-    },
+    }),
   }));
 
   // ----------------------------------------------------------------- list
@@ -588,9 +724,9 @@ export function apply(ctx, config = {}) {
     },
     timeoutMs: 60_000,
     isConcurrencySafe: () => true,
-    async execute() {
+    execute: guard(async () => {
       const { out } = await runCli(engineDir, ['list'], { timeoutMs: 60_000, projectsDir });
       return { projects: lastJson(out) || [] };
-    },
+    }),
   }));
 }
