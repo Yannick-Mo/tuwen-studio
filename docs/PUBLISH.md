@@ -49,7 +49,6 @@ https://awesome-dsh-plugin.com/plugins.json      # 截至今天 8489 条
 | 安装 | `dsh plugin --profile <名字> add github:Yannick-Mo/tuwen-studio` |
 | 图标 | `assets/icon.png`，256×256，从 `plugin-video-studio/icon.svg` 渲染 |
 | 已验证 | `npm i github:Yannick-Mo/tuwen-studio` → 装完能作为插件加载，注册 6 个 `video_studio_*` 工具 |
-| 还差 | 仓库描述和 topics 是空的；市场收录还没提交 |
 
 npm 上 `tuwen-studio` 这个包名**还没人占用**；另外已经有一个 `dsh-video-studio`（作者 litao，0.4.3），
 做的是「把素材目录剪成片」，和这个不冲突但名字容易混，描述里要把「AI 出图 + 真配音」说清楚。

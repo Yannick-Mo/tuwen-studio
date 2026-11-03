@@ -16,14 +16,6 @@
 
 > 当前版本 0.2.0。装法、自检、配 Key 见下面「安装」。
 
-**公开的例子**：`projects/` 下每个目录都是一条真实跑过的片子，看 `storyboard.md` 就是分镜表，
-看 `project.json` 就是排好的时间轴和字幕；剧本源头在 `specs/`。
-
-- [黑洞科普 · 7 镜 · 竖屏](projects/blackhole/storyboard.md)（内置 demo，`tuwen demo` 就是它）
-- [双人对白 · 三个声音 · 6 镜](projects/dialogue/storyboard.md)（两个角色各一把嗓子 + 旁白）
-- [爽文 · 5 镜 · 漫画字幕](projects/shuangwen/storyboard.md)
-- [横屏 16:9 试拍](projects/wide169/storyboard.md)
-
 ---
 
 ## 安装
@@ -375,12 +367,3 @@ edge 是**纯 Node 实现**（`msedge-tts`），不需要 Python、不需要 `pi
 | 4 进程并行 | **51s** |
 
 瓶颈在 Chromium 截帧（约 90ms/帧），不在编码。`seek()` 本身只有 2ms。
-
----
-
-## 待办（P1~P4）
-
-- 真实图像模型适配器（Seedream / 万相 / Nano Banana），替换 `mock-art.js`
-- LLM 写脚本与分镜（现在由 Agent 在对话里写，够用但没固化）
-- 角色一致性（角色圣经 + 参考图）
-- 视频工坊面板：分镜卡片、画布预览、单镜重生成（P4）

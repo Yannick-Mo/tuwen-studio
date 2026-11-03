@@ -3,21 +3,9 @@ node_modules/
 .models/
 .tmp/
 
-# projects/ 对外公开：只入库能复现、能读懂的东西——
-#   spec.json     这一条的剧本（输入）
-#   storyboard.md 分镜表（人话版）
-#   project.json  排好的时间轴 / 字幕（机器版）
-#   storyboard.json 同上，结构化
-# 图片、配音、分段、成片这些大文件一律不入库。
-projects/*/img/
-projects/*/voice/
-projects/*/work/
-projects/*/out/
-projects/*/assets/
-
-# 测试跑出来的临时项目
-projects/smoke/
-projects/gate-test/
+# projects/ 全是运行产物：剧本来自 specs/，其余是渲染中间态和成片。
+# 想公开某一条，再单独 git add 那个目录里的 spec.json / storyboard.md。
+projects/
 
 .env
 *.log
