@@ -5,7 +5,7 @@
  */
 import path from 'node:path';
 import { buildProject } from './demo.js';
-import { normalizeProject } from './schema.js';
+import { normalizeProject, VOICE_PRESETS } from './schema.js';
 import { buildPrompt, shotFor } from './images.js';
 import { buildTimeline } from './timeline.js';
 import { synthesizeAll } from './tts.js';
@@ -57,12 +57,34 @@ export function buildStoryboard(spec, opts = {}) {
     seen.add(s.id);
     if (!s.narration || !s.narration.trim()) problems.push(`${s.id} 没有旁白`);
     if (s.narration && s.narration.length > 42) warnings.push(`${s.id} 旁白 ${s.narration.length} 字，字幕大概率要折成两行`);
+    if (!s.visual?.subject && !s.motif) warnings.push(`${s.id} 没有 visual.subject，出图会退化成用旁白当描述`);
+
     for (const id of s.cast || []) {
       if (!project.characters.some((c) => c.id === id)) problems.push(`${s.id} 的 cast 引用了不存在的角色：${id}`);
     }
-    if (!s.visual?.subject && !s.motif) warnings.push(`${s.id} 没有 visual.subject，出图会退化成用旁白当描述`);
+    // speaker 写错不会报错，只会静默用项目嗓子——必须拦下来
+    if (s.speaker && !project.characters.some((c) => c.id === s.speaker)) {
+      problems.push(`${s.id} 的 speaker 引用了不存在的角色：${s.speaker}（会在不知情时用回项目默认嗓子）`);
+    }
   }
   if (!project.scenes.length) problems.push('没有镜头');
+  if (project.scenes.length && project.scenes.length < 3) {
+    warnings.push('少于 3 镜，语气曲线和换人停顿都不会生效（它们至少要 3 镜才有意义）');
+  }
+
+  // 配音配置：非法值现在静默忽略，等于悄悄用了默认嗓子
+  const engine = project.voice?.engine;
+  if (engine && !['edge', 'volc'].includes(engine)) {
+    problems.push(`voice.engine 只能是 edge 或 volc，收到：${engine}`);
+  }
+  if (engine === 'volc' && !project.voice?.reference) {
+    warnings.push('volc 没有指定 voice.reference：音色锚点会取当次第一句，换条片子嗓子会变');
+  }
+  for (const c of project.characters) {
+    const p = c.voice?.preset;
+    if (c.voice && !p && !c.voice.name) warnings.push(`角色 ${c.id} 的 voice 既没 preset 也没 name，会退回项目嗓子`);
+    if (p && !VOICE_PRESETS[p]) warnings.push(`角色 ${c.id} 的 voice.preset 不认识：${p}`);
+  }
 
   // 有真实配音就用真实时长，没有再退回估算
   const measured = opts.voices || null;

@@ -29,16 +29,19 @@ node src/cli.js demo
 
 ## 在对话里用（DSH 插件）
 
-插件 `@local/dsh-video-studio` 已装进当前 profile，装了就有三个工具：
+插件 `@local/dsh-video-studio` 已装进当前 profile（是 Junction，指向本仓库，改了立刻生效）。五个工具：
 
 | 工具 | 干什么 |
 |---|---|
-| `video_studio_build` | 给一份剧本描述（JSON），直接出 mp4 |
+| `video_studio_guide` | **先调这个**：完整使用手册，选型/分镜写法/交付检查/常见坑 |
+| `video_studio_build` | 给一份剧本描述（JSON），先出分镜表，确认后出 mp4 |
+| `video_studio_scene` | 只改一镜，25 秒 |
 | `video_studio_frames` | 从已渲染项目里取静帧审片（每帧 0.1 秒） |
 | `video_studio_list` | 列出本机项目 |
 
 说一句「用图文视频工坊做一条关于银河系的竖屏视频，三镜」就能跑。
-插件源码在 [plugin-video-studio](plugin-video-studio)，配置里 `engineDir` 指向本仓库。
+
+**手册是给 agent 看的**：[docs/PLAYBOOK.md](docs/PLAYBOOK.md)。新会话没有历史上下文，`video_studio_guide` 返回的就是这份文件——风格怎么选、台词多长、哪五个坑已经踩过，都写在里面。改手册不用改代码。
 
 ---
 

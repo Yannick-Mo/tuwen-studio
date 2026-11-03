@@ -72,6 +72,7 @@ export function apply(ctx, config = {}) {
     name: 'video_studio_build',
     description: [
       '把一份「剧本描述」渲染成图文视频（mp4）：自动生成画面、合成配音、按真实语音时长排时间轴、逐帧渲染、混音、质检。',
+      '不确定参数怎么填，先调 video_studio_guide 拿完整手册（选型、分镜写法、交付检查、常见坑）。',
       '重要：第一次调用不要传 confirmed，只会返回分镜表（每镜景别/台词/实测时长/图片张数），一分钱不花。分镜表里的时长是真跑了一遍配音量出来的，不是估的。把分镜表给人看过、改完 spec 之后，再带 confirmed: true 调用一次才真正出图。',
       '画面优先走火山方舟 Seedream（.env 里的 ARK_API_KEY）；配额用尽或没配置时自动降级成本地占位图，结果里的 images.mode 会写明是 ark 还是 mock。',
       '一条 30 秒视频大约 1~2 分钟（含出图）；调用前先把旁白写成短句（每句 8~20 字、对应一个镜头），场景数量 = 镜头数量。',
@@ -222,7 +223,16 @@ export function apply(ctx, config = {}) {
           const { out } = await runCli(engineDir, ['plan', specPath, '--json'], { timeoutMs: 180_000 });
           const sb = lastJson(out);
           if (!sb) return { ok: false, error: '分镜表生成失败' };
-          return { ok: true, planned: true, storyboard: sb };
+          return {
+            ok: true,
+            planned: true,
+            storyboard: sb,
+            hint: [
+              '这份表没花钱。确认前先看完 warnings 和 problems。',
+              '要改风格/配音/节奏拿不准时，调 video_studio_guide。',
+              '人点头之后再带 confirmed: true 调用。',
+            ].join('\n'),
+          };
         } catch (e) {
           return { ok: false, error: String(e.message).slice(0, 1500) };
         }
@@ -235,6 +245,37 @@ export function apply(ctx, config = {}) {
         return result;
       } catch (e) {
         return { ok: false, error: String(e.message).slice(0, 2000) };
+      }
+    },
+  }));
+
+  // ---------------------------------------------------------------- guide
+  ctx.effect(() => ctx.tools.register({
+    name: 'video_studio_guide',
+    description: [
+      '这个插件的完整用法手册：怎么选风格和配音、spec 怎么写、分镜要注意什么、交付前查哪几项、哪些坑已经踩过。',
+      '第一次用、或者不确定某个参数怎么填时，先调它。返回的是纯文本，读完再动手。',
+    ].join('\n'),
+    parameters: {},
+    output: {
+      schema: {
+        type: 'object',
+        additionalProperties: true,
+        properties: {
+          ok: { type: 'boolean' },
+          guide: { type: 'string' },
+          error: { type: 'string' },
+        },
+      },
+      render: (_a, v) => [{ type: 'text', text: v.ok ? v.guide : `手册读取失败：${v.error}` }],
+    },
+    async execute() {
+      try {
+        const p = path.join(import.meta.dirname, '..', 'docs', 'PLAYBOOK.md');
+        const guide = await fs.readFile(p, 'utf8');
+        return { ok: true, guide };
+      } catch (e) {
+        return { ok: false, error: String(e.message).slice(0, 300) };
       }
     },
   }));
