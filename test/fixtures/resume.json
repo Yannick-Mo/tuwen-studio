@@ -1,0 +1,19 @@
+{
+  "id": "resume",
+  "title": "断点续渲测试",
+  "aspect": "9:16",
+  "style": { "preset": "flat" },
+  "voice": { "preset": "news" },
+  "scenes": [
+    { "id": "s01", "narration": "第一镜检查断点续渲。", "visual": { "subject": "深蓝底上一个白点" } },
+    { "id": "s02", "narration": "第二镜检查断点续渲。", "visual": { "subject": "深蓝底上两个白点" } },
+    { "id": "s03", "narration": "第三镜检查断点续渲。", "visual": { "subject": "深蓝底上三个白点" } },
+    { "id": "s04", "narration": "第四镜检查断点续渲。", "visual": { "subject": "深蓝底上四个白点" } },
+    { "id": "s05", "narration": "第五镜检查断点续渲。", "visual": { "subject": "深蓝底上五个白点" } },
+    { "id": "s06", "narration": "第六镜检查断点续渲。", "visual": { "subject": "深蓝底上六个白点" } },
+    { "id": "s07", "narration": "第七镜检查断点续渲。", "visual": { "subject": "深蓝底上七个白点" } },
+    { "id": "s08", "narration": "第八镜检查断点续渲。", "visual": { "subject": "深蓝底上八个白点" } },
+    { "id": "s09", "narration": "第九镜检查断点续渲。", "visual": { "subject": "深蓝底上九个白点" } },
+    { "id": "s10", "narration": "第十镜检查断点续渲。", "visual": { "subject": "深蓝底上十个白点" } }
+  ]
+}

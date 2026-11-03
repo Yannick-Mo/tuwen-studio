@@ -13,7 +13,7 @@ import { renderMusic, ensureSfx } from './synth.js';
 import { openStage, mount, grabFrame } from './stage.js';
 import { pickImages, generateOne, ensureCharacterSheets } from './images.js';
 import { qcReport, contactSheet, imageSheet } from './qc.js';
-import { ensureDir, exists, loadEnv, decodePcm, log, writeJson } from './util.js';
+import { ensureDir, exists, loadEnv, decodePcm, log, writeJson, sha1 } from './util.js';
 import { DEMO, buildProject, withSubjects } from './demo.js';
 import { buildStoryboard, formatStoryboard, measureVoices } from './plan.js';
 
@@ -37,6 +37,17 @@ function finalizeCaptions(project, timeline, prepared) {
       emphasis: [],
     }];
   });
+}
+
+/** 每镜一个渲染指纹：这一镜的时间轴/字幕/图层/图片。只有它变了，这一镜才重渲 */
+async function renderFingerprint(project, stageProject, imgDir) {
+  // 用图片内容而不是修改时间：缓存命中时会把文件重新拷一遍，mtime 每次都变
+  const out = [];
+  for (const [i, s] of project.scenes.entries()) {
+    const buf = await fs.readFile(path.join(imgDir, `${s.id}.jpg`)).catch(() => null);
+    out.push(sha1(`${JSON.stringify(stageProject.scenes[i] || {})}|${buf ? sha1(buf) : 0}`));
+  }
+  return out;
 }
 
 async function runDemo(demo, opts = {}) {
@@ -113,6 +124,7 @@ async function runDemo(demo, opts = {}) {
       }).filter((r) => r.toFrame > r.fromFrame);
     }
     const stageProject = toStageProject(project);
+    const fingerprint = await renderFingerprint(project, stageProject, imgDir);
     const concurrency = Math.max(1, Math.min(opts.jobs || 4, (os.cpus().length || 4) - 1));
     const pages = [stage.page];
     for (let i = 1; i < concurrency; i++) pages.push(await stage.makeWorker());
@@ -121,7 +133,7 @@ async function runDemo(demo, opts = {}) {
 
     const segs = await encodeParallel(pages, ranges, project.meta.fps, segDir, (d, t) => {
       if (d % 30 === 0 || d === t) log(`   ${String(Math.round((d / t) * 100)).padStart(3)}%  ${d}/${t} 帧  ${el()}`);
-    });
+    }, { fingerprints: fingerprint });
     const video = path.join(workDir, 'video.mp4');
     await concatSegments(segs, video);
 
@@ -217,13 +229,14 @@ async function renderProject(projectFile, opts = {}) {
   const stage = await openStage({ width, height });
   try {
     const stageProject = toStageProject(project);
+    const fingerprint = await renderFingerprint(project, stageProject, path.join(dir, 'img'));
     const concurrency = Math.max(1, Math.min(opts.jobs || 4, (os.cpus().length || 4) - 1));
     const pages = [stage.page];
     for (let i = 1; i < concurrency; i++) pages.push(await stage.makeWorker());
     for (const p of pages) await mount(p, stageProject);
     const segs = await encodeParallel(pages, timeline.ranges, project.meta.fps, path.join(workDir, 'seg'), (d, t) => {
       if (d % 60 === 0 || d === t) log(`   ${String(Math.round((d / t) * 100)).padStart(3)}%`);
-    });
+    }, { fingerprints: fingerprint });
     const video = path.join(workDir, 'video.mp4');
     await concatSegments(segs, video);
     const voiceWav = path.join(workDir, 'voice.wav');

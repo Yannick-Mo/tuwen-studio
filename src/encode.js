@@ -17,12 +17,14 @@ function writeAsync(stream, buf) {
 }
 
 async function encodeSegment(page, fromFrame, count, fps, file, onFrame) {
+  // 先写 .part 再改名：中途被杀，不会留下一个「看起来完整」的坏段
+  const part = `${file}.part`;
   const args = [
     '-y', '-hide_banner', '-loglevel', 'error',
     '-f', 'image2pipe', '-vcodec', 'mjpeg', '-framerate', String(fps), '-i', '-',
     '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20',
     '-pix_fmt', 'yuv420p', '-r', String(fps), '-g', String(fps * 2),
-    '-an', file,
+    '-an', '-f', 'mp4', part,
   ];
   const child = spawn('ffmpeg', args, { stdio: ['pipe', 'ignore', 'pipe'] });
   let stderr = '';
@@ -40,17 +42,39 @@ async function encodeSegment(page, fromFrame, count, fps, file, onFrame) {
   }
   child.stdin.end();
   await done;
+  await fs.rename(part, file);
 }
 
 /** 多页并行：每镜一个渲染进程，帧管道各自灌进各自的 ffmpeg */
-export async function encodeParallel(pages, ranges, fps, outDir, onProgress) {
+export async function encodeParallel(pages, ranges, fps, outDir, onProgress, opts = {}) {
   await ensureDir(outDir);
   const work = ranges.filter((r) => r.toFrame > r.fromFrame);
-  const total = work.reduce((n, r) => n + (r.toFrame - r.fromFrame), 0);
+
+  // 断点续渲：按「镜」记账。只有这一镜的时间轴或图片变了，才重渲这一镜。
+  // 长片渲到一半崩了，不用从第一帧重来。
+  const segFile = (i) => path.join(outDir, `seg_${String(i).padStart(3, '0')}.mp4`);
+  const fpFile = path.join(outDir, '.fingerprints.json');
+  const wanted = opts.fingerprints || [];
+  const saved = await fs.readFile(fpFile, 'utf8').then(JSON.parse).catch(() => ({}));
+
+  const skipSet = new Set();
+  if (wanted.length) {
+    for (const r of work) {
+      const want = wanted[r.index];
+      const ok = want && saved[String(r.index)] === want
+        && await fs.stat(segFile(r.index)).then((s) => s.size > 1024).catch(() => false);
+      if (ok) skipSet.add(r.index);
+      else await fs.rm(segFile(r.index), { force: true });
+    }
+  }
+
+  const todo = work.filter((r) => !skipSet.has(r.index));
+  const total = todo.reduce((n, r) => n + (r.toFrame - r.fromFrame), 0);
+  if (skipSet.size) log(`  断点续渲：跳过 ${skipSet.size} 段已完成的，还要渲 ${todo.length} 段`);
 
   const groups = Array.from({ length: pages.length }, () => []);
   const loads = new Array(pages.length).fill(0);
-  for (const r of work) {
+  for (const r of todo) {
     const i = loads.indexOf(Math.min(...loads));
     groups[i].push(r);
     loads[i] += r.toFrame - r.fromFrame;
@@ -59,15 +83,20 @@ export async function encodeParallel(pages, ranges, fps, outDir, onProgress) {
   let done = 0;
   await Promise.all(groups.map((g, i) => (async () => {
     for (const r of g) {
-      const file = path.join(outDir, `seg_${String(r.index).padStart(3, '0')}.mp4`);
+      const file = segFile(r.index);
       await encodeSegment(pages[i], r.fromFrame, r.toFrame - r.fromFrame, fps, file, () => {
         done++;
         if (onProgress && (done % 30 === 0 || done === total)) onProgress(done, total);
       });
+      // 每渲完一段就记一笔，崩了也能从这里接着来
+      if (wanted.length) {
+        saved[String(r.index)] = wanted[r.index];
+        await fs.writeFile(fpFile, JSON.stringify(saved), 'utf8').catch(() => {});
+      }
     }
   })()));
 
-  return work.map((r) => path.join(outDir, `seg_${String(r.index).padStart(3, '0')}.mp4`));
+  return work.map((r) => segFile(r.index));
 }
 
 export async function encodeRanges(page, ranges, fps, outDir, onProgress) {
