@@ -76,6 +76,18 @@ export const VOICE_PRESETS = {
   soft: { name: 'zh-CN-XiaoyiNeural', rate: '+0%', pitch: '+2Hz' },
 };
 
+/**
+ * 各平台的底部 UI 高度（占画面高度的比例）。
+ * 字幕别压在这条线以下，否则会被播放器的点赞/进度条盖住。
+ */
+export const PLATFORM_SAFE = {
+  douyin: 0.172,
+  xiaohongshu: 0.15,
+  wechat: 0.18,
+  bilibili: 0.095,
+  youtube: 0.10,
+};
+
 const DEFAULTS = {
   fps: 30,
   aspect: '9:16',
@@ -105,6 +117,9 @@ export function normalizeProject(raw) {
       fps,
       lang: meta.lang || DEFAULTS.lang,
       platform: meta.platform || 'douyin',
+      coverShot: meta.coverShot || '',
+      kicker: meta.kicker || '',
+      coverTitle: meta.coverTitle || '',
     },
     style: (() => {
       // 什么都没写就按电影写实来，别让新 spec 裸着、一条风格词都没有
@@ -201,6 +216,7 @@ export function toStageProject(project) {
     grade: GRADES[project.style.grade] || GRADES.none,
     palette: project.style.palette,
     captionStyle: project.style.caption,
+    captionBottom: PLATFORM_SAFE[project.meta.platform] ?? PLATFORM_SAFE.douyin,
     scenes: project.scenes.map((s) => ({
       id: s.id,
       start: s.start,

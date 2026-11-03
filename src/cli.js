@@ -13,6 +13,7 @@ import { renderMusic, ensureSfx } from './synth.js';
 import { openStage, mount, grabFrame } from './stage.js';
 import { pickImages, generateOne, ensureCharacterSheets } from './images.js';
 import { qcReport, contactSheet, imageSheet } from './qc.js';
+import { makeCover, pickCoverScene } from './cover.js';
 import { ensureDir, exists, loadEnv, decodePcm, log, writeJson, sha1 } from './util.js';
 import { DEMO, buildProject, withSubjects } from './demo.js';
 import { buildStoryboard, formatStoryboard, measureVoices } from './plan.js';
@@ -37,6 +38,32 @@ function finalizeCaptions(project, timeline, prepared) {
       emphasis: [],
     }];
   });
+}
+
+/** 重渲前把上一版成片挪进 out/history/，只留最近 5 个 */
+async function archivePrevious(outDir, id) {
+  const mp4 = path.join(outDir, `${id}.mp4`);
+  if (!(await exists(mp4))) return null;
+  const hist = path.join(outDir, 'history');
+  await ensureDir(hist);
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const dst = path.join(hist, `${stamp}.mp4`);
+  await fs.copyFile(mp4, dst);
+  const files = (await fs.readdir(hist)).filter((f) => f.endsWith('.mp4')).sort();
+  while (files.length > 5) {
+    await fs.rm(path.join(hist, files.shift()), { force: true });
+  }
+  return dst;
+}
+
+/** 每渲一版就在 versions.json 里记一笔，方便「回到上一版」 */
+async function recordVersion(outDir, entry) {
+  const f = path.join(outDir, 'versions.json');
+  let list = [];
+  try { list = JSON.parse(await fs.readFile(f, 'utf8')); } catch { list = []; }
+  list.push(entry);
+  while (list.length > 20) list.shift();
+  await writeJson(f, list);
 }
 
 /** 每镜一个渲染指纹：这一镜的时间轴/字幕/图层/图片。只有它变了，这一镜才重渲 */
@@ -151,8 +178,10 @@ async function runDemo(demo, opts = {}) {
       const mix = path.join(workDir, 'mix.m4a');
       await mixAudio({ voiceWav, bgm, total: timeline.totalDuration, out: mix, loudness: project.audio.loudness ?? -14, bgmGain: project.audio.bgmGain ?? -13 });
 
-      // ⑥ 成片
+      // ⑥ 成片（先把上一版存进 history，别让好的那一版被覆盖掉）
       const out = path.join(outDir, `${demo.id}.mp4`);
+      const archived = await archivePrevious(outDir, demo.id);
+      if (archived) log(`  上一版已归档 → ${path.relative(process.cwd(), archived)}`);
       await mux(video, mix, out);
 
       // ⑦ 质检
@@ -163,7 +192,33 @@ async function runDemo(demo, opts = {}) {
 
       const sheet = path.join(outDir, 'contact-sheet.jpg');
       await contactSheet(out, sheet);
-      await grabFrame(stage.page, Math.min(1400, timeline.totalDuration * 400), path.join(outDir, 'cover.jpg'));
+
+      // 封面：拿指定镜头的画面当底，压暗之后把标题放上去，比抽帧靠谱
+      const coverFile = path.join(outDir, 'cover.jpg');
+      const coverScene = (project.scenes || []).find((s) => s.id === project.meta.coverShot)
+        || pickCoverScene(project);
+      const coverSrc = coverScene ? path.join(imgDir, `${coverScene.id}.jpg`) : null;
+      let coverOk = false;
+      if (coverSrc && (await exists(coverSrc))) {
+        try {
+          const coverPage = await stage.browser.newPage();
+          await makeCover(coverPage, {
+            image: coverSrc,
+            title: project.meta.coverTitle || project.meta.title,
+            kicker: project.meta.kicker || '',
+            w: project.meta.size[0],
+            h: project.meta.size[1],
+            out: coverFile,
+          });
+          await coverPage.close();
+          coverOk = true;
+        } catch (e) {
+          log(`  ! 封面生成失败：${String(e.message).slice(0, 80)}`);
+        }
+      }
+      if (!coverOk) {
+        await grabFrame(stage.page, Math.min(1400, timeline.totalDuration * 400), coverFile);
+      }
 
       // 画面没全部用上模型，这条片子就不算成品——质检只看技术指标，看不出来
       const degraded = imageResult.stats.mode !== 'ark';
@@ -177,6 +232,15 @@ async function runDemo(demo, opts = {}) {
         scenes: timeline.scenes.map((s) => ({ id: s.id, start: +s.start.toFixed(2), end: +s.end.toFixed(2) })),
       };
       await writeJson(path.join(outDir, 'result.json'), result);
+      await recordVersion(outDir, {
+        at: new Date().toISOString(),
+        duration: result.duration,
+        sizeMB: result.sizeMB,
+        ok: result.ok,
+        degraded,
+        engine: project.voice?.engineUsed || 'edge',
+        scenes: project.scenes.length,
+      });
 
       if (degraded) {
         log(`\n! 画面降级（mode=${imageResult.stats.mode}）：技术指标合格，但画面不是全模型出的，不算成品`);

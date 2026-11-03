@@ -115,7 +115,7 @@ export function buildProject(demo, { assetBase }) {
 
   return {
     id: demo.id,
-    meta: { title: demo.title, template: demo.template, aspect: demo.aspect, fps: 30, lang: 'zh-CN' },
+    meta: { title: demo.title, template: demo.template, aspect: demo.aspect, fps: 30, lang: 'zh-CN', coverShot: demo.coverShot || '', kicker: demo.kicker || '', coverTitle: demo.coverTitle || '' },
     style: demo.style,
     voice: demo.voice,
     audio: { bgm: null, bgmGain: -9, duck: true, loudness: -14, ...(demo.audio || {}) },

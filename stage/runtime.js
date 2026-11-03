@@ -607,6 +607,7 @@
     S.fps = project.fps || 30;
     S.grade = project.grade || 'none';
     S.capStyle = CAP_STYLES[project.captionStyle] || CAP_STYLES.karaoke;
+    S.capBottom = project.captionBottom ?? 0.172;
 
     const root = document.getElementById('root');
     root.innerHTML = '';
@@ -656,7 +657,7 @@
     // 字幕层
     const capEl = document.createElement('div');
     capEl.id = 'captions';
-    capEl.style.bottom = `${Math.round(S.H * 0.172)}px`;
+    capEl.style.bottom = `${Math.round(S.H * S.capBottom)}px`;
     capEl.style.opacity = '0';
     root.appendChild(capEl);
     S.capEl = capEl;

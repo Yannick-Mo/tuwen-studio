@@ -95,6 +95,10 @@ export function apply(ctx, config = {}) {
         properties: {
           id: { type: 'string', description: '项目 id，小写字母数字与短横线，例如 "deepsea"。同一 id 会覆盖旧项目。' },
           title: { type: 'string', description: '视频标题' },
+          coverTitle: { type: 'string', description: '封面上的钩子（一行字），不填就用 title。写钩子，不要写片名' },
+          coverShot: { type: 'string', description: '封面用哪一镜的画面当底图，例如 "s1"；不填自动挑有角色的第一镜' },
+          kicker: { type: 'string', description: '封面标题上方那行小字，例如「爽文 · 第 1 集」' },
+          platform: { type: 'string', enum: ['douyin', 'xiaohongshu', 'wechat', 'bilibili', 'youtube'], description: '发布平台，决定字幕安全区（底部 UI 会盖住多少）。默认 douyin' },
           aspect: { type: 'string', enum: ['9:16', '16:9', '3:4', '1:1'], description: '画幅，默认 9:16' },
           voice: {
             type: 'object',

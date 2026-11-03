@@ -11,7 +11,9 @@
     ],
     "fps": 30,
     "lang": "zh-CN",
-    "platform": "douyin"
+    "platform": "douyin",
+    "coverShot": "",
+    "kicker": ""
   },
   "style": {
     "preset": "manga",
@@ -30,7 +32,8 @@
     "name": "zh-CN-YunjianNeural",
     "rate": "+12%",
     "pitch": "-2Hz",
-    "preset": "passion"
+    "preset": "passion",
+    "engineUsed": "edge"
   },
   "audio": {
     "bgm": null,
@@ -79,8 +82,7 @@
               "end": 2.892
             }
           ],
-          "emphasis": [],
-          "style": "main"
+          "emphasis": []
         }
       ],
       "layers": [
@@ -141,8 +143,7 @@
               "end": 3.496
             }
           ],
-          "emphasis": [],
-          "style": "main"
+          "emphasis": []
         }
       ],
       "layers": [
@@ -199,8 +200,7 @@
               "end": 3.898
             }
           ],
-          "emphasis": [],
-          "style": "main"
+          "emphasis": []
         }
       ],
       "layers": [
@@ -255,8 +255,7 @@
               "end": 3.411
             }
           ],
-          "emphasis": [],
-          "style": "main"
+          "emphasis": []
         }
       ],
       "layers": [
@@ -313,8 +312,7 @@
               "end": 3.643
             }
           ],
-          "emphasis": [],
-          "style": "main"
+          "emphasis": []
         }
       ],
       "layers": [
