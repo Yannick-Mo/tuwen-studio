@@ -79,7 +79,9 @@ function castLine(project, scene) {
   const refMap = multi
     ? chars.map((c, i) => `参考图${i + 1}是${c.name}`).join('，') + '；两个人不能串脸'
     : '参考图1就是该人物';
-  return `画面中的人物：${parts.join('；')}。${refMap}，五官、发型、伤疤、服装必须与参考图一致`;
+  // 参考图现在是四视图设定：告诉模型按需要的角度取用，而不是照抄其中一格
+  const views = '每张参考图是同一人物的四视图设定（从左到右：正面、左侧、右侧、背面），只取本镜需要的角度';
+  return `画面中的人物：${parts.join('；')}。${refMap}。${views}，五官、发型、伤疤、服装、配饰必须与参考图一致`;
 }
 
 export function buildPrompt(project, scene, index = 0) {
@@ -90,12 +92,13 @@ export function buildPrompt(project, scene, index = 0) {
   const style = [project.style?.token, scene.visual?.style].filter(Boolean).join('，');
   const cast = castLine(project, scene);
   const vertical = project.meta.aspect === '9:16';
+  // 别写「底部留白」：模型会照字面画一条空白带。字幕安全区靠主体位置解决，不靠留白。
   const composition = project.style?.composition || (vertical
-    ? '竖屏 9:16 构图，主体位于画面中上部，底部三分之一保持简洁以便叠加字幕'
-    : '横屏 16:9 构图，主体偏左，右侧保留干净空间以便叠加字幕');
+    ? '竖屏 9:16 构图，主体位于画面中上部，画面铺满整个画幅、四边不留空白边距'
+    : '横屏 16:9 构图，主体偏左，画面铺满整个画幅、四边不留空白边距');
   const negatives = hasCast
-    ? '画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现第三个人'
-    : '画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏，不要出现完整人物或人脸';
+    ? '画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现第三个人'
+    : '画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现完整人物或人脸';
   // 景别放最前（权重最高），量化约束放到接近结尾（收尾强调）
   return [shot.text, cast, subject, style, composition, framing, negatives, project.style?.negative]
     .filter(Boolean).join('，');
@@ -112,16 +115,19 @@ export async function ensureCharacterSheets({ project, dir, env }) {
   const cacheDir = path.join(CACHE_DIR, 'chars');
   await ensureDir(imgDir);
   await ensureDir(cacheDir);
-  const size = imageSizeFor(project, e);
+  // 四视图横着排，用横图才装得下；和成片画幅无关
+  const size = '2560x1440';
   const model = e.ARK_IMAGE_MODEL;
 
   for (const c of chars) {
     const prompt = [
-      '角色定妆照，正面半身，简洁深灰背景，柔光，电影感',
+      '同一人物的四视图设定图：正面、左侧面、右侧面、背面，四个视角从左到右并排，全身，中性站姿，纯浅灰背景，均匀柔光',
+      '四个视角的发型、脸、服装、配饰必须完全一致，只是角度不同',
       `${c.name}，${c.look}${c.outfit ? `，${c.outfit}` : ''}`,
       project.style?.token,
+      '整张图不要出现任何文字、标注、数字、水印、边框',
     ].filter(Boolean).join('，');
-    const key = sha1(`sheet|${model}|${size}|${prompt}`);
+    const key = sha1(`sheet4|${model}|${size}|${prompt}`);
     const cachedFile = path.join(cacheDir, `${key}.jpg`);
     const dst = path.join(imgDir, `_char_${c.id}.jpg`);
 
@@ -129,7 +135,7 @@ export async function ensureCharacterSheets({ project, dir, env }) {
       if (!arkAvailable(e)) continue;
       const out = await generateArk({ apiKey: e.ARK_API_KEY, baseURL: e.ARK_BASE_URL, model, prompt, size, seed: 7 });
       await fs.writeFile(cachedFile, out.buffer);
-      log(`  · 定妆照 ${c.name}  ${(out.buffer.length / 1024).toFixed(0)}KB`);
+      log(`  · 角色设定图 ${c.name}（四视图）  ${(out.buffer.length / 1024).toFixed(0)}KB`);
     }
     await fs.copyFile(cachedFile, dst);
     const b64 = (await fs.readFile(dst)).toString('base64');

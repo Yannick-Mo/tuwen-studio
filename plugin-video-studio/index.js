@@ -77,7 +77,7 @@ export function apply(ctx, config = {}) {
       '画面优先走火山方舟 Seedream（.env 里的 ARK_API_KEY）；配额用尽或没配置时自动降级成本地占位图，结果里的 images.mode 会写明是 ark 还是 mock。',
       '一条 30 秒视频大约 1~2 分钟（含出图）；调用前先把旁白写成短句（每句 8~20 字、对应一个镜头），场景数量 = 镜头数量。',
       'spec.scenes[] 每个元素：narration（必填，该镜旁白）、motif（画面母题，见下）、motion（运镜）、texts（画面上叠加的文字）、transitionOut（转场）。',
-      '要人物反复出现时，在 spec.characters 里定义一次（{ id, name, look 外貌, outfit 服装 }），再在每镜用 cast: ["id"] 引用；会先生成一张定妆照，之后每镜把它当参考图，脸和服装才稳。',
+      '要人物反复出现时，在 spec.characters 里定义一次（{ id, name, look 外貌, outfit 服装, voice 可选 }），再在每镜用 cast: ["id"] 引用。引擎会先给每个角色生成一张**四视图设定图**（正面/左侧/右侧/背面）当资产，之后每镜传进去，脸、发型、服装才稳；转身和背面不用特殊写法。',
       '配音引擎两选一（voice.engine）：edge 免费、确定性、逐句可控，适合科普/新闻/知识；volc 会演、像人、能听懂 performance 描述，适合故事/对白/爽文，但它慢 5 倍、时长会变长 30~50%、生成不确定。默认 edge。引擎按整条决定，volc 中途失败会整条退回 edge，不会一条片子里混两套声音。',
       '多人对白：characters[].voice 给每个角色自己的嗓子，scenes[].speaker 标这句谁说的；两者和 cast 是分开的（cast 管画面里有谁）。换人说话会自动留 0.45 秒停顿。',
       '景别默认按镜头顺序轮换（大全景/中景/特写/仰拍/俯视），也可以在某镜用 visual.shot 指定一句话。',
