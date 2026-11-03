@@ -2,7 +2,7 @@
   "name": "tuwen-studio",
   "version": "0.2.0",
   "description": "图文视频工坊：一句主题 → 配音、画面、动效、字幕、成片。既是 DSH 插件，也自带 CLI 和渲染引擎。",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "Yannick-Mo",
   "repository": {
     "type": "git",
