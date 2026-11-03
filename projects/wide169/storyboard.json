@@ -1,0 +1,94 @@
+{
+  "ok": true,
+  "id": "wide169",
+  "title": "潮汐 · 横屏试拍",
+  "aspect": "16:9",
+  "scenes": [
+    {
+      "index": 1,
+      "id": "s1",
+      "narration": "海边一天涨落两次，是谁在拉这根绳？",
+      "voiceSeconds": 3.94,
+      "shotSeconds": 4.6,
+      "shot": "超广角航拍大全景，地平线位于画面上三分之一",
+      "framing": "",
+      "subject": "黄昏的海岸线航拍，退潮后的滩涂留下层层水痕，远处海面泛着暖橙色反光",
+      "cast": [],
+      "speaker": "",
+      "voice": {
+        "rate": "+0%",
+        "pitch": "-2Hz",
+        "delivery": "open",
+        "name": ""
+      },
+      "transition": "crossfade 0.5s",
+      "prompt": "超广角航拍大全景，地平线位于画面上三分之一，黄昏的海岸线航拍，退潮后的滩涂留下层层水痕，远处海面泛着暖橙色反光，cinematic film still, volumetric light, shallow depth of field, 35mm, photorealistic, ultra detailed，横屏 16:9 构图，主体偏左，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands, cartoon, anime, illustration, flat colors"
+    },
+    {
+      "index": 2,
+      "id": "s2",
+      "narration": "答案在三十八万公里外——月球。",
+      "voiceSeconds": 3.7,
+      "shotSeconds": 4.4,
+      "shot": "中景，月球位于画面中央偏右",
+      "framing": "",
+      "subject": "月球悬在纯黑深空中，表面环形山被侧光照亮，边缘有一圈极淡的蓝边",
+      "cast": [],
+      "speaker": "",
+      "voice": null,
+      "transition": "zoom-blur 0.45s",
+      "prompt": "中景，月球位于画面中央偏右，月球悬在纯黑深空中，表面环形山被侧光照亮，边缘有一圈极淡的蓝边，cinematic film still, volumetric light, shallow depth of field, 35mm, photorealistic, ultra detailed，横屏 16:9 构图，主体偏左，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands, cartoon, anime, illustration, flat colors"
+    },
+    {
+      "index": 3,
+      "id": "s3",
+      "narration": "它把地球朝它那一面的海水拉高。",
+      "voiceSeconds": 3.38,
+      "shotSeconds": 4.07,
+      "shot": "大全景，地球弧线横贯画面",
+      "framing": "",
+      "subject": "从太空侧视地球，海洋表面朝月球方向被拉出一个平缓的隆起，月光斜射在海面上",
+      "cast": [],
+      "speaker": "",
+      "voice": {
+        "rate": "+10%",
+        "pitch": "+1Hz",
+        "delivery": "build",
+        "name": ""
+      },
+      "transition": "crossfade 0.45s",
+      "prompt": "大全景，地球弧线横贯画面，从太空侧视地球，海洋表面朝月球方向被拉出一个平缓的隆起，月光斜射在海面上，cinematic film still, volumetric light, shallow depth of field, 35mm, photorealistic, ultra detailed，横屏 16:9 构图，主体偏左，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands, cartoon, anime, illustration, flat colors"
+    },
+    {
+      "index": 4,
+      "id": "s4",
+      "narration": "地球自转穿过两个鼓包，一天就淹了两次。",
+      "voiceSeconds": 4.34,
+      "shotSeconds": 5.03,
+      "shot": "超广角俯拍大全景，海岸线贯穿画面",
+      "framing": "",
+      "subject": "俯视海岸，涨潮的海水漫过滩涂和礁石，细密的浪花边缘形成弧线",
+      "cast": [],
+      "speaker": "",
+      "voice": {
+        "rate": "-2%",
+        "pitch": "+0Hz",
+        "delivery": "close",
+        "name": ""
+      },
+      "transition": "crossfade 0.6s",
+      "prompt": "超广角俯拍大全景，海岸线贯穿画面，俯视海岸，涨潮的海水漫过滩涂和礁石，细密的浪花边缘形成弧线，cinematic film still, volumetric light, shallow depth of field, 35mm, photorealistic, ultra detailed，横屏 16:9 构图，主体偏左，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands, cartoon, anime, illustration, flat colors"
+    }
+  ],
+  "totals": {
+    "scenes": 4,
+    "images": 4,
+    "characterSheets": 0,
+    "estimatedSeconds": 17.97,
+    "durationSource": "estimated",
+    "frames": 539,
+    "estimatedMinutes": 0.7
+  },
+  "problems": [],
+  "warnings": []
+}

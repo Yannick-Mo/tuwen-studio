@@ -1,0 +1,749 @@
+{
+  "version": 1,
+  "id": "chapter01",
+  "meta": {
+    "title": "第三章 · 寂静的驾驶舱",
+    "template": "knowledge-v1",
+    "aspect": "9:16",
+    "size": [
+      1080,
+      1920
+    ],
+    "fps": 30,
+    "lang": "zh-CN",
+    "platform": "douyin"
+  },
+  "style": {
+    "token": "cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic",
+    "negative": "text, watermark, logo, extra fingers, deformed hands",
+    "palette": [
+      "#05070d",
+      "#1b4b6b",
+      "#f97316"
+    ],
+    "grade": "teal-orange-soft"
+  },
+  "voice": {
+    "provider": "edge",
+    "name": "zh-CN-YunxiNeural",
+    "rate": "+4%",
+    "pitch": "+0Hz"
+  },
+  "audio": {
+    "bgm": null,
+    "bgmGain": -19,
+    "duck": true,
+    "loudness": -14,
+    "tailFade": 0.6
+  },
+  "deliver": {
+    "burnSubtitles": true,
+    "cover": true,
+    "srt": true,
+    "aigcLabel": true,
+    "crf": 18
+  },
+  "timeline": {
+    "totalFrames": 559,
+    "totalDuration": 18.633333333333333,
+    "fps": 30
+  },
+  "characters": [
+    {
+      "id": "lin",
+      "name": "林夏",
+      "look": "二十二岁中国女性，齐肩黑色短发，左眉上方一道细疤，眼神冷静，皮肤质感真实",
+      "outfit": "橙色战术太空服，领口金属环，黑色高领内衬",
+      "sheet": null
+    }
+  ],
+  "scenes": [
+    {
+      "id": "s1",
+      "narration": "凌晨三点，她在驾驶舱里醒了过来。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "凌晨三点，她在驾驶舱里醒了过来。",
+          "start": 0.32,
+          "end": 4.158,
+          "words": [
+            {
+              "w": "凌",
+              "start": 0.4,
+              "end": 0.596
+            },
+            {
+              "w": "晨",
+              "start": 0.596,
+              "end": 0.791
+            },
+            {
+              "w": "三",
+              "start": 0.791,
+              "end": 0.987
+            },
+            {
+              "w": "点",
+              "start": 0.987,
+              "end": 1.182
+            },
+            {
+              "w": "，",
+              "start": 1.182,
+              "end": 1.612
+            },
+            {
+              "w": "她",
+              "start": 1.612,
+              "end": 1.808
+            },
+            {
+              "w": "在",
+              "start": 1.808,
+              "end": 2.003
+            },
+            {
+              "w": "驾",
+              "start": 2.003,
+              "end": 2.199
+            },
+            {
+              "w": "驶",
+              "start": 2.199,
+              "end": 2.395
+            },
+            {
+              "w": "舱",
+              "start": 2.395,
+              "end": 2.59
+            },
+            {
+              "w": "里",
+              "start": 2.59,
+              "end": 2.786
+            },
+            {
+              "w": "醒",
+              "start": 2.786,
+              "end": 2.981
+            },
+            {
+              "w": "了",
+              "start": 2.981,
+              "end": 3.177
+            },
+            {
+              "w": "过",
+              "start": 3.177,
+              "end": 3.372
+            },
+            {
+              "w": "来",
+              "start": 3.372,
+              "end": 3.568
+            },
+            {
+              "w": "。",
+              "start": 3.568,
+              "end": 3.998
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/chapter01/img/s1.jpg",
+          "motion": {
+            "preset": "push-in",
+            "amount": 0.1,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "crossfade",
+        "duration": 0.45
+      },
+      "visual": {
+        "subject": "昏暗的飞船驾驶舱内部，她靠在座椅上刚睁开眼，仪表盘发出冷蓝微光，空气里有细尘",
+        "shot": "中景，人物位于画面中上部，环境占两侧"
+      },
+      "cast": [
+        "lin"
+      ],
+      "start": 0,
+      "duration": 4.266666666666667,
+      "voiceStart": 0.4,
+      "voiceDur": 3.597958333333333,
+      "meta": {}
+    },
+    {
+      "id": "s2",
+      "narration": "舷窗外，地球已经不见了。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "舷窗外，地球已经不见了。",
+          "start": 0.353,
+          "end": 2.76,
+          "words": [
+            {
+              "w": "舷",
+              "start": 0.433,
+              "end": 0.584
+            },
+            {
+              "w": "窗",
+              "start": 0.584,
+              "end": 0.734
+            },
+            {
+              "w": "外",
+              "start": 0.734,
+              "end": 0.885
+            },
+            {
+              "w": "，",
+              "start": 0.885,
+              "end": 1.216
+            },
+            {
+              "w": "地",
+              "start": 1.216,
+              "end": 1.366
+            },
+            {
+              "w": "球",
+              "start": 1.366,
+              "end": 1.517
+            },
+            {
+              "w": "已",
+              "start": 1.517,
+              "end": 1.667
+            },
+            {
+              "w": "经",
+              "start": 1.667,
+              "end": 1.818
+            },
+            {
+              "w": "不",
+              "start": 1.818,
+              "end": 1.968
+            },
+            {
+              "w": "见",
+              "start": 1.968,
+              "end": 2.119
+            },
+            {
+              "w": "了",
+              "start": 2.119,
+              "end": 2.269
+            },
+            {
+              "w": "。",
+              "start": 2.269,
+              "end": 2.6
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/chapter01/img/s2.jpg",
+          "motion": {
+            "preset": "push-in",
+            "amount": 0.1,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "zoom-blur",
+        "duration": 0.5
+      },
+      "visual": {
+        "subject": "她贴在舷窗玻璃上向外看，窗外只有深空和一条细长星带，玻璃有反光",
+        "shot": "侧后方过肩视角，人物背影与侧脸各占一半"
+      },
+      "cast": [
+        "lin"
+      ],
+      "start": 4,
+      "duration": 2.8666666666666667,
+      "voiceStart": 4.433333333333334,
+      "voiceDur": 2.1670833333333333,
+      "meta": {}
+    },
+    {
+      "id": "s3",
+      "narration": "警报响了第三遍。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "警报响了第三遍。",
+          "start": 0.353,
+          "end": 2.065,
+          "words": [
+            {
+              "w": "警",
+              "start": 0.433,
+              "end": 0.593
+            },
+            {
+              "w": "报",
+              "start": 0.593,
+              "end": 0.753
+            },
+            {
+              "w": "响",
+              "start": 0.753,
+              "end": 0.913
+            },
+            {
+              "w": "了",
+              "start": 0.913,
+              "end": 1.073
+            },
+            {
+              "w": "第",
+              "start": 1.073,
+              "end": 1.233
+            },
+            {
+              "w": "三",
+              "start": 1.233,
+              "end": 1.393
+            },
+            {
+              "w": "遍",
+              "start": 1.393,
+              "end": 1.553
+            },
+            {
+              "w": "。",
+              "start": 1.553,
+              "end": 1.905
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/chapter01/img/s3.jpg",
+          "motion": {
+            "preset": "push-in",
+            "amount": 0.1,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "whip-pan",
+        "duration": 0.4
+      },
+      "visual": {
+        "subject": "驾驶舱顶部的警报灯旋转，红色光扫过金属舱壁和仪表台，烟雾轻微",
+        "shot": "极特写，红色警报灯占满画面"
+      },
+      "cast": [],
+      "start": 6.6,
+      "duration": 2.1666666666666665,
+      "voiceStart": 7.033333333333333,
+      "voiceDur": 1.4711666666666667,
+      "meta": {}
+    },
+    {
+      "id": "s4",
+      "narration": "她盯着屏幕上那行字，没有动。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "她盯着屏幕上那行字，没有动。",
+          "start": 0.353,
+          "end": 2.987,
+          "words": [
+            {
+              "w": "她",
+              "start": 0.433,
+              "end": 0.579
+            },
+            {
+              "w": "盯",
+              "start": 0.579,
+              "end": 0.725
+            },
+            {
+              "w": "着",
+              "start": 0.725,
+              "end": 0.871
+            },
+            {
+              "w": "屏",
+              "start": 0.871,
+              "end": 1.017
+            },
+            {
+              "w": "幕",
+              "start": 1.017,
+              "end": 1.163
+            },
+            {
+              "w": "上",
+              "start": 1.163,
+              "end": 1.309
+            },
+            {
+              "w": "那",
+              "start": 1.309,
+              "end": 1.455
+            },
+            {
+              "w": "行",
+              "start": 1.455,
+              "end": 1.601
+            },
+            {
+              "w": "字",
+              "start": 1.601,
+              "end": 1.747
+            },
+            {
+              "w": "，",
+              "start": 1.747,
+              "end": 2.068
+            },
+            {
+              "w": "没",
+              "start": 2.068,
+              "end": 2.214
+            },
+            {
+              "w": "有",
+              "start": 2.214,
+              "end": 2.36
+            },
+            {
+              "w": "动",
+              "start": 2.36,
+              "end": 2.506
+            },
+            {
+              "w": "。",
+              "start": 2.506,
+              "end": 2.827
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/chapter01/img/s4.jpg",
+          "motion": {
+            "preset": "push-in",
+            "amount": 0.1,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "crossfade",
+        "duration": 0.45
+      },
+      "visual": {
+        "subject": "她的脸部特写，屏幕蓝光从下方打亮半张脸，眼神没有焦点，睫毛清晰",
+        "shot": "面部特写，人物居中，背景完全虚化"
+      },
+      "cast": [
+        "lin"
+      ],
+      "start": 8.5,
+      "duration": 3.1,
+      "voiceStart": 8.933333333333334,
+      "voiceDur": 2.3934375,
+      "meta": {}
+    },
+    {
+      "id": "s5",
+      "narration": "然后她按下了那个红色的按钮。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "然后她按下了那个红色的按钮。",
+          "start": 0.353,
+          "end": 3.402,
+          "words": [
+            {
+              "w": "然",
+              "start": 0.433,
+              "end": 0.618
+            },
+            {
+              "w": "后",
+              "start": 0.618,
+              "end": 0.803
+            },
+            {
+              "w": "她",
+              "start": 0.803,
+              "end": 0.988
+            },
+            {
+              "w": "按",
+              "start": 0.988,
+              "end": 1.172
+            },
+            {
+              "w": "下",
+              "start": 1.172,
+              "end": 1.357
+            },
+            {
+              "w": "了",
+              "start": 1.357,
+              "end": 1.542
+            },
+            {
+              "w": "那",
+              "start": 1.542,
+              "end": 1.727
+            },
+            {
+              "w": "个",
+              "start": 1.727,
+              "end": 1.912
+            },
+            {
+              "w": "红",
+              "start": 1.912,
+              "end": 2.096
+            },
+            {
+              "w": "色",
+              "start": 2.096,
+              "end": 2.281
+            },
+            {
+              "w": "的",
+              "start": 2.281,
+              "end": 2.466
+            },
+            {
+              "w": "按",
+              "start": 2.466,
+              "end": 2.651
+            },
+            {
+              "w": "钮",
+              "start": 2.651,
+              "end": 2.836
+            },
+            {
+              "w": "。",
+              "start": 2.836,
+              "end": 3.242
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/chapter01/img/s5.jpg",
+          "motion": {
+            "preset": "push-in",
+            "amount": 0.1,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "flash",
+        "duration": 0.4
+      },
+      "visual": {
+        "subject": "一只戴黑色手套的手伸向控制台上的红色按钮，指尖刚要触到，周围是冷色仪表",
+        "shot": "手部特写，浅景深，按钮是画面最亮处"
+      },
+      "cast": [],
+      "start": 11.333333333333334,
+      "duration": 3.5,
+      "voiceStart": 11.766666666666667,
+      "voiceDur": 2.80875,
+      "meta": {}
+    },
+    {
+      "id": "s6",
+      "narration": "一切安静得，像是什么都没发生过。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "一切安静得，像是什么都没发生过。",
+          "start": 0.353,
+          "end": 3.307,
+          "words": [
+            {
+              "w": "一",
+              "start": 0.433,
+              "end": 0.581
+            },
+            {
+              "w": "切",
+              "start": 0.581,
+              "end": 0.728
+            },
+            {
+              "w": "安",
+              "start": 0.728,
+              "end": 0.876
+            },
+            {
+              "w": "静",
+              "start": 0.876,
+              "end": 1.023
+            },
+            {
+              "w": "得",
+              "start": 1.023,
+              "end": 1.171
+            },
+            {
+              "w": "，",
+              "start": 1.171,
+              "end": 1.495
+            },
+            {
+              "w": "像",
+              "start": 1.495,
+              "end": 1.643
+            },
+            {
+              "w": "是",
+              "start": 1.643,
+              "end": 1.79
+            },
+            {
+              "w": "什",
+              "start": 1.79,
+              "end": 1.938
+            },
+            {
+              "w": "么",
+              "start": 1.938,
+              "end": 2.085
+            },
+            {
+              "w": "都",
+              "start": 2.085,
+              "end": 2.233
+            },
+            {
+              "w": "没",
+              "start": 2.233,
+              "end": 2.38
+            },
+            {
+              "w": "发",
+              "start": 2.38,
+              "end": 2.528
+            },
+            {
+              "w": "生",
+              "start": 2.528,
+              "end": 2.675
+            },
+            {
+              "w": "过",
+              "start": 2.675,
+              "end": 2.823
+            },
+            {
+              "w": "。",
+              "start": 2.823,
+              "end": 3.147
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/chapter01/img/s6.jpg",
+          "motion": {
+            "preset": "push-in",
+            "amount": 0.1,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": null,
+      "visual": {
+        "subject": "驾驶舱全景，她背对镜头坐在座椅上，所有屏幕都暗了，只有星光照进来",
+        "shot": "大全景，人物很小，环境占主导"
+      },
+      "cast": [
+        "lin"
+      ],
+      "start": 14.566666666666666,
+      "duration": 4.066666666666666,
+      "voiceStart": 15,
+      "voiceDur": 2.7136458333333335,
+      "meta": {}
+    }
+  ]
+}

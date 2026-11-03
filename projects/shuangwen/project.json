@@ -1,0 +1,361 @@
+{
+  "version": 1,
+  "id": "shuangwen",
+  "meta": {
+    "title": "爽文试拍 · 满分",
+    "template": "knowledge-v1",
+    "aspect": "9:16",
+    "size": [
+      1080,
+      1920
+    ],
+    "fps": 30,
+    "lang": "zh-CN",
+    "platform": "douyin",
+    "coverShot": "",
+    "kicker": ""
+  },
+  "style": {
+    "preset": "manga",
+    "token": "chinese manhua illustration, bold ink outlines, cel shading, dramatic rim light, vivid flat colors, comic panel art, clean lineart",
+    "negative": "text, watermark, logo, photorealistic, 3d render, deformed hands, extra fingers, muddy colors",
+    "palette": [
+      "#101828",
+      "#2f6bff",
+      "#ff8b3d"
+    ],
+    "grade": "none",
+    "caption": "comic"
+  },
+  "voice": {
+    "provider": "edge",
+    "name": "zh-CN-YunjianNeural",
+    "rate": "+12%",
+    "pitch": "-2Hz",
+    "preset": "passion",
+    "engineUsed": "edge"
+  },
+  "audio": {
+    "bgm": null,
+    "bgmGain": -9,
+    "duck": true,
+    "loudness": -14,
+    "tailFade": 0.6,
+    "bgmStyle": "tense"
+  },
+  "deliver": {
+    "burnSubtitles": true,
+    "cover": true,
+    "srt": true,
+    "aigcLabel": true,
+    "crf": 18
+  },
+  "timeline": {
+    "totalFrames": 410,
+    "totalDuration": 13.666666666666666,
+    "fps": 30
+  },
+  "characters": [
+    {
+      "id": "chen",
+      "name": "陈默",
+      "look": "十七岁中国男高中生，短黑发，眉眼冷淡，左耳一颗小痣，皮肤干净",
+      "outfit": "白色短袖校服衬衫，袖口卷到小臂，左胸蓝色校徽",
+      "voice": null,
+      "sheet": null
+    }
+  ],
+  "scenes": [
+    {
+      "id": "s1",
+      "narration": "全班都以为我是个废物。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "全班都以为我是个废物。",
+          "start": 0.42,
+          "end": 3.052,
+          "words": [
+            {
+              "w": "全班都以为我是个废物。",
+              "start": 0.5,
+              "end": 2.892
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/shuangwen/img/s1.jpg",
+          "motion": {
+            "preset": "push-in",
+            "amount": 0.1,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "whip-pan",
+        "duration": 0.35
+      },
+      "voice": {
+        "rate": "+8%",
+        "pitch": "-4Hz",
+        "delivery": "open"
+      },
+      "speaker": null,
+      "performance": null,
+      "visual": {
+        "subject": "教室后排，陈默趴在课桌上，侧脸贴着桌面，周围同学回头看他，漫画速度线从画面边缘向内收",
+        "shot": "中景，人物偏右，桌上堆着揉皱的草稿纸"
+      },
+      "cast": [
+        "chen"
+      ],
+      "start": 0,
+      "duration": 2.2333333333333334,
+      "voiceStart": 0.4,
+      "voiceDur": 1.5642708333333333,
+      "meta": {}
+    },
+    {
+      "id": "s2",
+      "narration": "直到我把那张试卷，拍在桌上。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "直到我把那张试卷，拍在桌上。",
+          "start": 0.453,
+          "end": 3.656,
+          "words": [
+            {
+              "w": "直到我把那张试卷，拍在桌上。",
+              "start": 0.533,
+              "end": 3.496
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/shuangwen/img/s2.jpg",
+          "motion": {
+            "preset": "shake",
+            "amount": 0.12,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "flash",
+        "duration": 0.25
+      },
+      "voice": null,
+      "speaker": null,
+      "performance": null,
+      "visual": {
+        "subject": "特写，一只少年的手把试卷重重拍在课桌上，纸角被震起，桌面木纹清晰，背景是模糊的教室",
+        "shot": "极特写，手和试卷占画面下半部"
+      },
+      "cast": [
+        "chen"
+      ],
+      "start": 1.9666666666666666,
+      "duration": 2.8666666666666667,
+      "voiceStart": 2.4,
+      "voiceDur": 2.1812291666666668,
+      "meta": {}
+    },
+    {
+      "id": "s3",
+      "narration": "满分的红勾，一整个教室都安静了。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "满分的红勾，一整个教室都安静了。",
+          "start": 0.453,
+          "end": 4.058,
+          "words": [
+            {
+              "w": "满分的红勾，一整个教室都安静了。",
+              "start": 0.533,
+              "end": 3.898
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/shuangwen/img/s3.jpg",
+          "motion": {
+            "preset": "push-in",
+            "amount": 0.14,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "zoom-blur",
+        "duration": 0.4
+      },
+      "voice": null,
+      "speaker": null,
+      "performance": null,
+      "visual": {
+        "subject": "试卷特写，鲜红的满分数字和一道巨大红勾压在纸上，背景虚化成安静下来的教室轮廓",
+        "shot": "极特写，试卷卷面占满画面"
+      },
+      "cast": [],
+      "start": 4.566666666666666,
+      "duration": 3.2666666666666666,
+      "voiceStart": 5,
+      "voiceDur": 2.5778958333333333,
+      "meta": {}
+    },
+    {
+      "id": "s4",
+      "narration": "班主任的手，抖了一下。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "班主任的手，抖了一下。",
+          "start": 0.453,
+          "end": 3.571,
+          "words": [
+            {
+              "w": "班主任的手，抖了一下。",
+              "start": 0.533,
+              "end": 3.411
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/shuangwen/img/s4.jpg",
+          "motion": {
+            "preset": "still",
+            "amount": 0.02,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "crossfade",
+        "duration": 0.4
+      },
+      "voice": {
+        "rate": "+2%"
+      },
+      "speaker": null,
+      "performance": null,
+      "visual": {
+        "subject": "一只中年人的手捏着粉笔停在黑板上，指节泛白，粉笔灰飘落，黑板上是没写完的公式",
+        "shot": "极特写，手和粉笔占画面中央"
+      },
+      "cast": [],
+      "start": 7.566666666666666,
+      "duration": 2.7333333333333334,
+      "voiceStart": 8,
+      "voiceDur": 2.021625,
+      "meta": {}
+    },
+    {
+      "id": "s5",
+      "narration": "从今天起，没人再敢笑我。",
+      "audio": null,
+      "captions": [
+        {
+          "text": "从今天起，没人再敢笑我。",
+          "start": 0.453,
+          "end": 3.803,
+          "words": [
+            {
+              "w": "从今天起，没人再敢笑我。",
+              "start": 0.533,
+              "end": 3.643
+            }
+          ],
+          "emphasis": []
+        }
+      ],
+      "layers": [
+        {
+          "z": 0,
+          "type": "image",
+          "src": "/projects/shuangwen/img/s5.jpg",
+          "motion": {
+            "preset": "pull-out",
+            "amount": 0.1,
+            "ease": "outCubic"
+          }
+        }
+      ],
+      "fx": {
+        "particles": "dust",
+        "density": 0.32,
+        "grain": 0.035,
+        "vignette": 0.45
+      },
+      "transitionOut": {
+        "type": "crossfade",
+        "duration": 0.6
+      },
+      "voice": {
+        "rate": "+6%",
+        "pitch": "-2Hz",
+        "delivery": "close"
+      },
+      "speaker": null,
+      "performance": null,
+      "visual": {
+        "subject": "陈默从座位上站起来，背对镜头看向窗外，逆光把轮廓压成剪影，窗外是刺眼的午后阳光",
+        "shot": "中景，人物居中，光从正前方打来"
+      },
+      "cast": [
+        "chen"
+      ],
+      "start": 10.033333333333333,
+      "duration": 3.6333333333333333,
+      "voiceStart": 10.466666666666667,
+      "voiceDur": 2.2784166666666668,
+      "meta": {}
+    }
+  ]
+}

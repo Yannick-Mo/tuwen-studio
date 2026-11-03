@@ -1,0 +1,136 @@
+{
+  "ok": true,
+  "id": "chapter02",
+  "title": "第四章 · 门开了",
+  "aspect": "9:16",
+  "scenes": [
+    {
+      "index": 1,
+      "id": "s1",
+      "narration": "舱门开了。周野站在门口。",
+      "voiceSeconds": 2.94,
+      "shotSeconds": 3.6,
+      "shot": "中景，人物位于画面中上部",
+      "framing": "",
+      "subject": "驾驶舱舱门口，周野站在逆光里，身后是走廊的冷白灯管，他手里捏着一块金属牌",
+      "cast": [
+        "周野"
+      ],
+      "speaker": "",
+      "voice": {
+        "rate": "-4%",
+        "pitch": "-2Hz",
+        "delivery": "open",
+        "name": ""
+      },
+      "transition": "crossfade 0.45s",
+      "prompt": "中景，人物位于画面中上部，画面中的人物：周野（三十岁中国男性，寸头，短络腮胡，右眉骨一道旧伤，皮肤粗糙，眼神疲惫，深灰色工装外套，袖口磨损，黑色内搭）。参考图1就是该人物。每张参考图是同一人物的四视图设定（从左到右：正面、左侧、右侧、背面），只取本镜需要的角度，五官、发型、伤疤、服装、配饰必须与参考图一致，驾驶舱舱门口，周野站在逆光里，身后是走廊的冷白灯管，他手里捏着一块金属牌，cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic，竖屏 9:16 构图，主体位于画面中上部，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现第三个人，text, watermark, logo, extra fingers, deformed hands"
+    },
+    {
+      "index": 2,
+      "id": "s2",
+      "narration": "他说，你按了那个按钮。",
+      "voiceSeconds": 2.74,
+      "shotSeconds": 3.43,
+      "shot": "面部特写，占画面高度三分之二以上",
+      "framing": "",
+      "subject": "周野的脸部特写，眉头压着，右眉骨的旧伤在侧光下很明显，嘴唇刚张开",
+      "cast": [
+        "周野"
+      ],
+      "speaker": "",
+      "voice": null,
+      "transition": "zoom-blur 0.5s",
+      "prompt": "面部特写，占画面高度三分之二以上，画面中的人物：周野（三十岁中国男性，寸头，短络腮胡，右眉骨一道旧伤，皮肤粗糙，眼神疲惫，深灰色工装外套，袖口磨损，黑色内搭）。参考图1就是该人物。每张参考图是同一人物的四视图设定（从左到右：正面、左侧、右侧、背面），只取本镜需要的角度，五官、发型、伤疤、服装、配饰必须与参考图一致，周野的脸部特写，眉头压着，右眉骨的旧伤在侧光下很明显，嘴唇刚张开，cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic，竖屏 9:16 构图，主体位于画面中上部，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现第三个人，text, watermark, logo, extra fingers, deformed hands"
+    },
+    {
+      "index": 3,
+      "id": "s3",
+      "narration": "她没有回答。",
+      "voiceSeconds": 1.58,
+      "shotSeconds": 2.27,
+      "shot": "中近景，人物偏右，左侧留空",
+      "framing": "",
+      "subject": "林夏坐在座椅上，眼睛看着地面，手在膝盖上攥紧，橙色太空服的反光落在下巴上",
+      "cast": [
+        "林夏"
+      ],
+      "speaker": "",
+      "voice": null,
+      "transition": "crossfade 0.45s",
+      "prompt": "中近景，人物偏右，左侧留空，画面中的人物：林夏（二十二岁中国女性，齐肩黑色短发，左眉上方一道细疤，眼神冷静，皮肤质感真实，橙色战术太空服，领口金属环，黑色高领内衬）。参考图1就是该人物。每张参考图是同一人物的四视图设定（从左到右：正面、左侧、右侧、背面），只取本镜需要的角度，五官、发型、伤疤、服装、配饰必须与参考图一致，林夏坐在座椅上，眼睛看着地面，手在膝盖上攥紧，橙色太空服的反光落在下巴上，cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic，竖屏 9:16 构图，主体位于画面中上部，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现第三个人，text, watermark, logo, extra fingers, deformed hands"
+    },
+    {
+      "index": 4,
+      "id": "s4",
+      "narration": "两个人在黑暗里对视。",
+      "voiceSeconds": 2.38,
+      "shotSeconds": 3.07,
+      "shot": "中景双人，左右各占一半画面",
+      "framing": "",
+      "subject": "驾驶舱里只剩应急灯，林夏和周野隔着控制台对视，中间是发红的仪表光",
+      "cast": [
+        "林夏",
+        "周野"
+      ],
+      "speaker": "",
+      "voice": null,
+      "transition": "whip-pan 0.4s",
+      "prompt": "中景双人，左右各占一半画面，画面中的人物：左侧是林夏（二十二岁中国女性，齐肩黑色短发，左眉上方一道细疤，眼神冷静，皮肤质感真实，橙色战术太空服，领口金属环，黑色高领内衬）；右侧是周野（三十岁中国男性，寸头，短络腮胡，右眉骨一道旧伤，皮肤粗糙，眼神疲惫，深灰色工装外套，袖口磨损，黑色内搭）。参考图1是林夏，参考图2是周野；两个人不能串脸。每张参考图是同一人物的四视图设定（从左到右：正面、左侧、右侧、背面），只取本镜需要的角度，五官、发型、伤疤、服装、配饰必须与参考图一致，驾驶舱里只剩应急灯，林夏和周野隔着控制台对视，中间是发红的仪表光，cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic，竖屏 9:16 构图，主体位于画面中上部，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现第三个人，text, watermark, logo, extra fingers, deformed hands"
+    },
+    {
+      "index": 5,
+      "id": "s5",
+      "narration": "舷窗外，星星开始移动。",
+      "voiceSeconds": 2.74,
+      "shotSeconds": 3.43,
+      "shot": "极特写，舷窗玻璃占满画面",
+      "framing": "",
+      "subject": "舷窗外，星带缓慢横向移动，玻璃上有一层薄雾和指纹",
+      "cast": [],
+      "speaker": "",
+      "voice": {
+        "rate": "+6%",
+        "pitch": "+1Hz",
+        "delivery": "build",
+        "name": ""
+      },
+      "transition": "crossfade 0.5s",
+      "prompt": "极特写，舷窗玻璃占满画面，舷窗外，星带缓慢横向移动，玻璃上有一层薄雾和指纹，cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic，竖屏 9:16 构图，主体位于画面中上部，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现完整人物或人脸，text, watermark, logo, extra fingers, deformed hands"
+    },
+    {
+      "index": 6,
+      "id": "s6",
+      "narration": "他们并排坐下，看着同一片星空。",
+      "voiceSeconds": 3.54,
+      "shotSeconds": 4.23,
+      "shot": "超广角大全景，环境占画面主导",
+      "framing": "",
+      "subject": "驾驶舱全景，林夏和周野并排坐在两张座椅上，背对镜头，面前是巨大的舷窗和星空",
+      "cast": [
+        "林夏",
+        "周野"
+      ],
+      "speaker": "",
+      "voice": {
+        "rate": "-6%",
+        "pitch": "+0Hz",
+        "delivery": "close",
+        "name": ""
+      },
+      "transition": "—",
+      "prompt": "超广角大全景，环境占画面主导，画面中的人物：左侧是林夏（二十二岁中国女性，齐肩黑色短发，左眉上方一道细疤，眼神冷静，皮肤质感真实，橙色战术太空服，领口金属环，黑色高领内衬）；右侧是周野（三十岁中国男性，寸头，短络腮胡，右眉骨一道旧伤，皮肤粗糙，眼神疲惫，深灰色工装外套，袖口磨损，黑色内搭）。参考图1是林夏，参考图2是周野；两个人不能串脸。每张参考图是同一人物的四视图设定（从左到右：正面、左侧、右侧、背面），只取本镜需要的角度，五官、发型、伤疤、服装、配饰必须与参考图一致，驾驶舱全景，林夏和周野并排坐在两张座椅上，背对镜头，面前是巨大的舷窗和星空，cinematic sci-fi film still, teal and orange, volumetric light, shallow depth of field, 35mm, realistic，竖屏 9:16 构图，主体位于画面中上部，画面铺满整个画幅、四边不留空白边距，画面中不要出现成段文字、对话气泡、水印、标志、边框、分屏、底部空白带，不要出现第三个人，text, watermark, logo, extra fingers, deformed hands"
+    }
+  ],
+  "totals": {
+    "scenes": 6,
+    "images": 6,
+    "characterSheets": 2,
+    "estimatedSeconds": 19.37,
+    "durationSource": "estimated",
+    "frames": 581,
+    "estimatedMinutes": 0.9
+  },
+  "problems": [],
+  "warnings": []
+}

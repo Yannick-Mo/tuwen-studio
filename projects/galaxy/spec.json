@@ -1,0 +1,78 @@
+{
+  "id": "galaxy",
+  "title": "银河系有多大",
+  "aspect": "9:16",
+  "style": {
+    "palette": [
+      "#05070d",
+      "#1e3a8a",
+      "#f59e0b"
+    ],
+    "grade": "teal-orange-soft"
+  },
+  "scenes": [
+    {
+      "narration": "银河系有多大？光走完一圈要十万年。",
+      "motif": "galaxy",
+      "motion": {
+        "preset": "push-in",
+        "amount": 0.15
+      },
+      "texts": [
+        {
+          "style": "keyword",
+          "text": "十万年",
+          "x": 96,
+          "y": 210,
+          "w": 800,
+          "at": 1.2,
+          "motion": {
+            "preset": "per-char",
+            "duration": 0.6
+          }
+        }
+      ],
+      "transitionOut": {
+        "type": "zoom-blur",
+        "duration": 0.5
+      }
+    },
+    {
+      "narration": "而我们的太阳，只是其中一粒尘埃。",
+      "motif": "star",
+      "motion": {
+        "preset": "pull-out",
+        "amount": 0.12
+      },
+      "transitionOut": {
+        "type": "crossfade",
+        "duration": 0.45
+      }
+    },
+    {
+      "narration": "银河系之外，还有两千亿个星系。",
+      "motif": "void",
+      "motion": {
+        "preset": "push-in",
+        "amount": 0.18
+      },
+      "texts": [
+        {
+          "style": "sub",
+          "text": "两千亿",
+          "x": 96,
+          "y": 230,
+          "w": 800,
+          "at": 1.4,
+          "motion": {
+            "preset": "fade-up"
+          }
+        }
+      ],
+      "transitionOut": {
+        "type": "flash",
+        "duration": 0.4
+      }
+    }
+  ]
+}
